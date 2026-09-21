@@ -71,7 +71,7 @@ async function boot(){
  }catch(e){S.token='';localStorage.removeItem('qz_student_token');localStorage.removeItem('qz_active_attempt');const d=await api('bootstrap');S.settings=d.settings;S.courses=d.courses||[];home()}
 }
 function home(){
- const studentBox=S.student?'<div class="welcome-card"><div class="flex"><div><div class="tiny">SIGNED IN AS</div><h2 class="section-title">'+esc(S.student.full_name)+'</h2><p class="sub">'+esc(S.student.phone)+'</p></div><div class="spacer"></div>'+subBadge()+'</div><div class="flex" style="margin-top:14px"><button class="btn primary" onclick="showProgress()">View My Progress</button>'+(S.subscription?.status==='approved'?'':'<button class="btn gold" onclick="showSubscribe()">Subscribe / Verify Payment</button>')+'</div></div>':'<div class="welcome-card"><h2 class="section-title">Start practising immediately</h2><p class="sub">Create a simple student profile with your name, phone number and a private PIN. The free sample quizzes do not require payment.</p><div class="flex" style="margin-top:14px"><button class="btn primary" onclick="showRegister()">Create Student Profile</button><button class="btn ghost" onclick="showLogin()">I Already Have an Account</button></div></div>';
+ const studentBox=S.student?'<div class="welcome-card"><div class="flex"><div><div class="tiny">SIGNED IN AS</div><h2 class="section-title">'+esc(S.student.full_name)+'</h2><p class="sub">'+esc(S.student.phone)+'</p></div><div class="spacer"></div>'+subBadge()+'</div><div class="flex" style="margin-top:14px"><button class="btn primary" onclick="showProgress()">View My Progress</button>'+(S.subscription?.status==='approved'?'<button class="btn green" onclick="showDownloadBank()">📥 Download Bank</button>':'<button class="btn gold" onclick="showSubscribe()">Subscribe / Verify Payment</button>')+'</div></div>':'<div class="welcome-card"><h2 class="section-title">Start practising immediately</h2><p class="sub">Create a simple student profile with your name, phone number and a private PIN. The free sample quizzes do not require payment.</p><div class="flex" style="margin-top:14px"><button class="btn primary" onclick="showRegister()">Create Student Profile</button><button class="btn ghost" onclick="showLogin()">I Already Have an Account</button></div></div>';
  const subBox='<div class="welcome-card"><div class="tiny">FULL ACCESS</div><h2 class="section-title">'+money(S.settings?.subscription_fee)+'</h2><p class="sub">One subscription unlocks the available full practice quizzes across all three courses after admin approval.</p><div class="alert info">MoMo: <b>'+esc(S.settings?.momo_number)+'</b> • '+esc(S.settings?.contact_name)+'</div><button class="btn green" onclick="whatsappSubscribe()">Contact on WhatsApp</button></div>';
  shell('<main class="main"><section class="welcome">'+studentBox+subBox+'</section><section class="panel"><h2 class="section-title">Choose a Course</h2><p class="sub">Each full practice attempt selects 20 questions randomly and gives you 30 minutes. Sample quizzes contain 10 questions.</p><div class="course-grid">'+S.courses.map((c,i)=>'<article class="course-card"><div class="course-icon">'+esc(c.icon||'📘')+'</div><h3>'+esc(c.title)+'</h3><p>'+esc(c.description||'')+'</p><button class="btn" onclick="openCourse(\''+c.slug+'\')">Open '+esc(c.short_code)+'</button></article>').join('')+'</div></section></main>');
 }
@@ -148,6 +148,43 @@ function renderResult(){
  const r=S.result;if(!r)return home();const p=Number(r.percentage||0).toFixed(1);
  shell('<main class="main"><section class="panel"><div class="flex"><div><h2 class="section-title">Marked Script</h2><p class="sub">'+esc(r.course_title)+' • '+esc(r.quiz_title)+' • '+new Date(r.submitted_at).toLocaleString()+'</p></div><div class="spacer"></div><button class="btn no-print" onclick="window.print()">Print / Save Marked Script</button></div><div class="scorebox"><div class="scorecircle">'+r.score+'/'+r.total+'</div><div><h2 style="margin:0;font-size:34px;color:var(--navy)">'+p+'%</h2><p class="sub">'+(r.timed_out?'Time elapsed — available answers were marked.':'Submitted successfully and marked instantly.')+'</p></div></div>'+r.marked.map((q,i)=>'<div class="script '+(q.correct?'correct':'wrong')+'"><div class="qhead"><span class="qnum">QUESTION '+(i+1)+'</span><span class="qtopic">'+(q.correct?'✓ Correct':'✗ Incorrect')+'</span></div><div class="qtext">'+esc(q.stem)+'</div><div style="margin-top:10px">'+q.options.map((o,j)=>'<div class="script-option '+(q.selected_index===j?'mine ':'')+(q.correct_index===j?'right':'')+'"><b>'+letters[j]+'.</b> '+esc(o)+(q.selected_index===j?' <b>← Your answer</b>':'')+(q.correct_index===j?' <b>← Correct answer</b>':'')+'</div>').join('')+'</div>'+(q.explanation?'<div class="alert info"><b>Explanation:</b> '+esc(q.explanation)+'</div>':'')+'</div>').join('')+'</section></main>');typeset();
 }
+function fmtBytes(n){
+ n=Number(n||0);if(!n)return '';
+ if(n<1024)return n+' B';
+ if(n<1048576)return (n/1024).toFixed(1)+' KB';
+ return (n/1048576).toFixed(n<10485760?1:0)+' MB';
+}
+async function showDownloadBank(){
+ if(!S.student)return showLogin();
+ if(S.subscription?.status!=='approved')return showSubscribe();
+ try{
+   const d=await api('download_bank');
+   const rows=d.resources||[];
+   const courseOrder=['ordinary-differential-equation','advanced-calculus-2'];
+   const sections=courseOrder.map(slug=>{
+     const items=rows.filter(r=>r.course_slug===slug);
+     if(!items.length)return '';
+     const title=items[0].course_title||slug;
+     const cats=[...new Set(items.map(r=>r.category))];
+     return '<section class="panel" style="margin-top:16px"><div class="tiny">SUBSCRIBER DOWNLOADS</div><h2 class="section-title">'+esc(title)+'</h2>'+
+       cats.map(cat=>'<h3 style="margin-top:20px;color:var(--navy)">'+esc(cat)+'</h3><div class="quiz-list">'+
+         items.filter(r=>r.category===cat).map(r=>'<div class="quiz-item"><div><h4>'+esc(r.title)+'</h4><p class="sub">'+esc(r.description||'')+'</p><div class="meta">'+(r.file_size_bytes?'<span>'+fmtBytes(r.file_size_bytes)+'</span>':'')+'<span>PDF</span></div></div><div><button class="btn green" onclick="downloadBankResource(\''+r.id+'\',this)">Download PDF</button></div></div>').join('')+
+       '</div>').join('')+'</section>';
+   }).join('');
+   shell('<main class="main"><section class="panel"><div class="flex"><div><div class="tiny">APPROVED SUBSCRIBER ACCESS</div><h2 class="section-title">Download Bank</h2><p class="sub">Solved past questions, formula books and revision materials. Download links are private and expire shortly after they are generated.</p></div><div class="spacer"></div>'+subBadge()+'</div><div class="alert info"><b>Subscriber only:</b> These materials are provided for your personal study and revision.</div></section>'+sections+'</main>');
+ }catch(e){alert(e.message)}
+}
+async function downloadBankResource(id,btn){
+ const old=btn?.textContent||'Download PDF';
+ try{
+   if(btn){btn.disabled=true;btn.textContent='Preparing…'}
+   const d=await api('download_resource',{resource_id:id});
+   const a=document.createElement('a');a.href=d.url;a.target='_blank';a.rel='noopener';a.download='';
+   document.body.appendChild(a);a.click();a.remove();
+ }catch(e){alert(e.message)}
+ finally{if(btn){btn.disabled=false;btn.textContent=old}}
+}
+
 async function showProgress(){
  if(!S.student)return showLogin();
  try{const d=await api('progress');renderProgress(d)}catch(e){alert(e.message)}
