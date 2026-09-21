@@ -111,7 +111,7 @@ function showCourseGuest(c){shell('<main class="main"><section class="panel"><h2
 function renderCourse(c){
  const qs=c.quizzes||[];
  shell('<main class="main"><section class="panel"><div class="flex"><div><div class="tiny">'+esc(c.short_code)+'</div><h2 class="section-title">'+esc(c.title)+'</h2><p class="sub">'+esc(c.description||'')+'</p></div><div class="spacer"></div>'+subBadge()+'</div><div class="quiz-list">'+(qs.length?qs.map(q=>{
-   const pastPaper=!q.is_sample&&q.question_bank_count===q.questions_per_attempt&&/^AC2-(RESIT|QUIZ)/.test(q.quiz_code||'');
+   const pastPaper=!q.is_sample&&q.question_bank_count===q.questions_per_attempt&&/^(AC2|ODE)-(RESIT|QUIZ|ENDSEM|EXAM)/.test(q.quiz_code||'');
    const startLabel=q.is_sample?'Try Free Sample':(pastPaper?'Start Past Paper':'Start Random Quiz');
    const theoryBtn=(!q.locked&&q.has_theory)?'<button class="btn green" style="margin-top:8px;width:100%" onclick="showTheory(\''+esc(q.quiz_code)+'\')">View Theory Solutions</button>':'';
    return '<div class="quiz-item '+(q.locked?'locked':'')+'"><div><h4>'+esc(q.title)+(q.is_sample?' <span class="badge ok">FREE SAMPLE</span>':(pastPaper?' <span class="badge info">PAST PAPER</span>':''))+'</h4><p class="sub">'+esc(q.description||'')+'</p><div class="meta"><span>'+q.question_bank_count+' questions in bank</span><span>'+q.questions_per_attempt+' per attempt</span><span>'+q.duration_minutes+' minutes</span><span>Code: '+esc(q.quiz_code)+'</span></div></div><div>'+(q.locked?'<button class="btn gold" onclick="showSubscribe()">🔒 Subscribe to Unlock</button>':'<button class="btn primary" '+(q.question_bank_count<1?'disabled':'')+' onclick="startQuiz(\''+q.id+'\')">'+startLabel+'</button>'+theoryBtn)+'</div></div>';
