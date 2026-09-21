@@ -110,7 +110,20 @@ function openCourse(slug){
 function showCourseGuest(c){shell('<main class="main"><section class="panel"><h2 class="section-title">'+esc(c.title)+'</h2><p class="sub">Sign in or create a student profile to attempt the free sample and save your progress.</p><div class="flex" style="margin-top:15px"><button class="btn primary" onclick="showRegister()">Create Profile</button><button class="btn ghost" onclick="showLogin()">Login</button></div></section></main>')}
 function renderCourse(c){
  const qs=c.quizzes||[];
- shell('<main class="main"><section class="panel"><div class="flex"><div><div class="tiny">'+esc(c.short_code)+'</div><h2 class="section-title">'+esc(c.title)+'</h2><p class="sub">'+esc(c.description||'')+'</p></div><div class="spacer"></div>'+subBadge()+'</div><div class="quiz-list">'+(qs.length?qs.map(q=>'<div class="quiz-item '+(q.locked?'locked':'')+'"><div><h4>'+esc(q.title)+(q.is_sample?' <span class="badge ok">FREE SAMPLE</span>':'')+'</h4><p class="sub">'+esc(q.description||'')+'</p><div class="meta"><span>'+q.question_bank_count+' questions in bank</span><span>'+q.questions_per_attempt+' per attempt</span><span>'+q.duration_minutes+' minutes</span><span>Code: '+esc(q.quiz_code)+'</span></div></div><div>'+(q.locked?'<button class="btn gold" onclick="showSubscribe()">🔒 Subscribe to Unlock</button>':'<button class="btn primary" '+(q.question_bank_count<1?'disabled':'')+' onclick="startQuiz(\''+q.id+'\')">'+(q.is_sample?'Try Free Sample':'Start Random Quiz')+'</button>')+'</div></div>').join(''):'<div class="alert warn">No quiz has been added to this course yet.</div>')+'</div></section></main>');
+ shell('<main class="main"><section class="panel"><div class="flex"><div><div class="tiny">'+esc(c.short_code)+'</div><h2 class="section-title">'+esc(c.title)+'</h2><p class="sub">'+esc(c.description||'')+'</p></div><div class="spacer"></div>'+subBadge()+'</div><div class="quiz-list">'+(qs.length?qs.map(q=>{
+   const pastPaper=!q.is_sample&&q.question_bank_count===q.questions_per_attempt&&/^AC2-(RESIT|QUIZ)/.test(q.quiz_code||'');
+   const startLabel=q.is_sample?'Try Free Sample':(pastPaper?'Start Past Paper':'Start Random Quiz');
+   const theoryBtn=(!q.locked&&q.has_theory)?'<button class="btn green" style="margin-top:8px;width:100%" onclick="showTheory(\''+esc(q.quiz_code)+'\')">View Theory Solutions</button>':'';
+   return '<div class="quiz-item '+(q.locked?'locked':'')+'"><div><h4>'+esc(q.title)+(q.is_sample?' <span class="badge ok">FREE SAMPLE</span>':(pastPaper?' <span class="badge info">PAST PAPER</span>':''))+'</h4><p class="sub">'+esc(q.description||'')+'</p><div class="meta"><span>'+q.question_bank_count+' questions in bank</span><span>'+q.questions_per_attempt+' per attempt</span><span>'+q.duration_minutes+' minutes</span><span>Code: '+esc(q.quiz_code)+'</span></div></div><div>'+(q.locked?'<button class="btn gold" onclick="showSubscribe()">🔒 Subscribe to Unlock</button>':'<button class="btn primary" '+(q.question_bank_count<1?'disabled':'')+' onclick="startQuiz(\''+q.id+'\')">'+startLabel+'</button>'+theoryBtn)+'</div></div>';
+ }).join(''):'<div class="alert warn">No quiz has been added to this course yet.</div>')+'</div></section></main>');
+}
+async function showTheory(code){
+ if(!S.student)return showLogin();
+ try{
+   const d=await api('theory_solution',{quiz_code:code}),r=d.resource;
+   shell('<main class="main"><section class="panel"><div class="flex no-print"><button class="btn ghost" onclick="renderCourse(S.course)">← Back to Advanced Calculus II</button><div class="spacer"></div><button class="btn primary" onclick="window.print()">Print / Save Theory Solutions</button></div><div style="margin-top:14px"><div class="tiny">'+esc(r.year_label||'')+'</div><h2 class="section-title">'+esc(r.title||'Theory Solutions')+'</h2><p class="sub">Available to approved subscribers for study and revision.</p></div><div class="theory-content" style="margin-top:18px;line-height:1.72">'+r.content_html+'</div></section></main>');
+   typeset();
+ }catch(e){alert(e.message)}
 }
 async function startQuiz(id){
  if(!S.student)return showLogin();
