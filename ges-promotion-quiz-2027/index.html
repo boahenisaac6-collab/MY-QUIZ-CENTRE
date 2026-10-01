@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#078447">
+<title>GES Promotion Quiz 2027</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./ges-logo.svg">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div class="shell" id="app">
+  <header class="top-brand">
+    <div class="flagline"></div>
+    <div class="brand-inner">
+      <img class="brand-logo" src="./ges-logo.svg" alt="Ghana Education Service logo">
+      <div class="brand-text"><h1>GES Promotion Quiz</h1><p>Assistant Director I &amp; II • Professional Teachers' Community</p></div>
+      <div class="year-badge">2027</div>
+    </div>
+  </header>
+
+  <main id="authScreen" class="page">
+    <section class="hero">
+      <h2>Prepare smart. Track your progress. Build confidence.</h2>
+      <p>Practice GES promotion questions on your phone with timed quizzes, instant answers, performance tracking and printable reports.</p>
+      <div class="hero-badges"><span class="mini-badge">922 Questions</span><span class="mini-badge">1 Question = 1 Minute</span><span class="mini-badge">20 or 30 Free</span></div>
+    </section>
+    <section class="card">
+      <div class="auth-tabs"><button id="showRegister" class="active">Register</button><button id="showLogin">Log in</button></div>
+      <div id="authAlert"></div>
+      <form id="registerForm">
+        <div class="card-title">Create your account</div>
+        <div class="field"><label>Full name</label><input id="regName" autocomplete="name" placeholder="Enter your full name" required></div>
+        <div class="field"><label>Telephone number</label><input id="regPhone" inputmode="tel" autocomplete="tel" placeholder="e.g. 0240000000" required></div>
+        <div class="field"><label>4-digit PIN</label><input id="regPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="new-password" type="password" placeholder="Create 4 digits" required></div>
+        <button class="primary block" type="submit">Register &amp; Start Free Practice</button>
+        <div class="note" style="margin-top:10px">Your free account gives you one timed practice session of either <strong>20 or 30 questions</strong>. Full access is activated after subscription approval.</div>
+      </form>
+      <form id="loginForm" class="hidden">
+        <div class="card-title">Welcome back</div>
+        <div class="field"><label>Telephone number</label><input id="loginPhone" inputmode="tel" autocomplete="tel" placeholder="Enter your telephone number" required></div>
+        <div class="field"><label>4-digit PIN</label><input id="loginPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="current-password" type="password" placeholder="Enter your PIN" required></div>
+        <button class="primary block" type="submit">Log in</button>
+      </form>
+    </section>
+    <section class="card subscribe-card">
+      <div class="card-title">Full access subscription</div>
+      <div class="price">GH₵30 <small>one-time access</small></div>
+      <ul class="feature-list"><li>Unlock all 922 revision questions</li><li>Practice any number of questions</li><li>Track individual performance and improvement</li><li>Print or save performance reports as PDF</li></ul>
+      <div class="contact-box"><div>For activation, contact <strong>Isaac</strong></div><div class="phone">0248 48 17 62</div></div>
+    </section>
+    <div class="footer">GES Promotion Quiz 2027 • Independent revision platform • <a href="./admin.html">Admin</a></div>
+  </main>
+
+  <main id="dashboardScreen" class="page hidden"></main>
+
+  <section id="quizScreen" class="hidden">
+    <header class="quiz-top">
+      <div class="quiz-bar">
+        <button id="exitQuiz" class="iconbtn">✕</button>
+        <div><div class="prog-meta"><span id="qProgress">Question 1 of 20</span><span id="answeredCount">0 answered</span></div><div class="progress"><span id="progressBar"></span></div></div>
+        <div id="timerBox" class="timer"><small>TIME LEFT</small><strong id="timerText">20:00</strong></div>
+      </div>
+    </header>
+    <main class="quiz-page">
+      <div id="qTags" class="q-tags"></div>
+      <article class="question-card">
+        <div id="qNo" class="qno"></div>
+        <div id="qText" class="qtext"></div>
+        <div id="options" class="options"></div>
+        <div id="explanation" class="explain hidden"></div>
+      </article>
+    </main>
+    <nav class="bottom-nav"><div class="inner"><button id="prevBtn" class="secondary">← Previous</button><button id="nextBtn" class="primary">Next →</button></div></nav>
+  </section>
+
+  <main id="resultScreen" class="page hidden"></main>
+  <main id="performanceScreen" class="page hidden"></main>
+</div>
+<div id="modalRoot"></div><div id="toastRoot"></div>
+<script src="./free-bank.js"></script><script src="./bank.enc.js"></script><script src="./topics.js"></script><script src="./app.js"></script>
+</body>
+</html>
