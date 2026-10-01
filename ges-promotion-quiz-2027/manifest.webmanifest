@@ -1,0 +1,17 @@
+{
+  "name": "GES Promotion Quiz 2027",
+  "short_name": "GES Quiz",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f8f6",
+  "theme_color": "#078447",
+  "icons": [
+    {
+      "src": "./ges-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "./"
+}
