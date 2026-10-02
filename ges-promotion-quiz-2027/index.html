@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#078447">
-<title>GES Promotion Quiz 2027</title>
+<title>GES AD I & AD II Promotion Quiz 2027</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./ges-logo.svg">
 <link rel="stylesheet" href="./styles.css">
@@ -15,7 +15,7 @@
     <div class="flagline"></div>
     <div class="brand-inner">
       <img class="brand-logo" src="./ges-logo.svg" alt="Ghana Education Service logo">
-      <div class="brand-text"><h1>GES Promotion Quiz</h1><p>Assistant Director I &amp; II • Professional Teachers' Community</p></div>
+      <div class="brand-text"><h1>GES Promotion Quiz</h1><p>Assistant Director I &amp; II • Professional Teachers' Revision Community</p></div>
       <div class="year-badge">2027</div>
     </div>
   </header>
@@ -24,31 +24,32 @@
     <section class="hero">
       <h2>Prepare smart. Track your progress. Build confidence.</h2>
       <p>Practice GES promotion questions on your phone with timed quizzes, instant answers, performance tracking and printable reports.</p>
-      <div class="hero-badges"><span class="mini-badge">922 Questions</span><span class="mini-badge">1 Question = 1 Minute</span><span class="mini-badge">20 or 30 Free</span></div>
+      <div class="hero-badges"><span class="mini-badge">922 Questions</span><span class="mini-badge">1 Question = 1 Minute</span><span class="mini-badge">30 Questions Free</span></div>
     </section>
     <section class="card">
       <div class="auth-tabs"><button id="showRegister" class="active">Register</button><button id="showLogin">Log in</button></div>
       <div id="authAlert"></div>
       <form id="registerForm">
-        <div class="card-title">Create your account</div>
+        <div class="card-title">Create your practice account</div>
         <div class="field"><label>Full name</label><input id="regName" autocomplete="name" placeholder="Enter your full name" required></div>
         <div class="field"><label>Telephone number</label><input id="regPhone" inputmode="tel" autocomplete="tel" placeholder="e.g. 0240000000" required></div>
-        <div class="field"><label>4-digit PIN</label><input id="regPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="new-password" type="password" placeholder="Create 4 digits" required></div>
+        <div class="field"><label>4-digit gate code (PIN)</label><input id="regPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="new-password" type="password" placeholder="Create 4 digits" required></div>
         <button class="primary block" type="submit">Register &amp; Start Free Practice</button>
-        <div class="note" style="margin-top:10px">Your free account gives you one timed practice session of either <strong>20 or 30 questions</strong>. Full access is activated after subscription approval.</div>
+        <div class="note" style="margin-top:10px">Every registered user receives <strong>one free timed practice of the first 30 questions</strong>. After the free practice, continued access requires subscription approval.</div>
       </form>
       <form id="loginForm" class="hidden">
         <div class="card-title">Welcome back</div>
         <div class="field"><label>Telephone number</label><input id="loginPhone" inputmode="tel" autocomplete="tel" placeholder="Enter your telephone number" required></div>
-        <div class="field"><label>4-digit PIN</label><input id="loginPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="current-password" type="password" placeholder="Enter your PIN" required></div>
+        <div class="field"><label>4-digit gate code (PIN)</label><input id="loginPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="current-password" type="password" placeholder="Enter your gate code" required></div>
         <button class="primary block" type="submit">Log in</button>
       </form>
     </section>
     <section class="card subscribe-card">
-      <div class="card-title">Full access subscription</div>
-      <div class="price">GH₵30 <small>one-time access</small></div>
-      <ul class="feature-list"><li>Unlock all 922 revision questions</li><li>Practice any number of questions</li><li>Track individual performance and improvement</li><li>Print or save performance reports as PDF</li></ul>
-      <div class="contact-box"><div>For activation, contact <strong>Isaac</strong></div><div class="phone">0248 48 17 62</div></div>
+      <div class="card-title">Unlock full access</div>
+      <div class="price">GH₵30 <small>subscription</small></div>
+      <ul class="feature-list"><li>Unlock all 922 revision questions</li><li>Practice by rank, topic and preferred question count</li><li>Track individual performance and improvement</li><li>Review marked answers and explanations</li><li>Print or save performance reports as PDF</li></ul>
+      <div class="contact-box"><div>After your free 30 questions, contact <strong>Sir Isaac</strong> on WhatsApp for activation.</div><div class="phone">0248 48 17 62</div></div>
+      <a class="primary block" style="display:flex;align-items:center;justify-content:center;text-decoration:none;margin-top:12px" href="https://wa.me/233248481762?text=Hello%20Sir%20Isaac%2C%20I%20want%20to%20subscribe%20to%20the%20GES%20AD%20I%20%26%20AD%20II%20Promotion%20Quiz%202027%20for%20GH%E2%82%B530.%20Please%20help%20me%20activate%20my%20full%20access." target="_blank" rel="noopener">WhatsApp Sir Isaac</a>
     </section>
     <div class="footer">GES Promotion Quiz 2027 • Independent revision platform • <a href="./admin.html">Admin</a></div>
   </main>
@@ -59,8 +60,8 @@
     <header class="quiz-top">
       <div class="quiz-bar">
         <button id="exitQuiz" class="iconbtn">✕</button>
-        <div><div class="prog-meta"><span id="qProgress">Question 1 of 20</span><span id="answeredCount">0 answered</span></div><div class="progress"><span id="progressBar"></span></div></div>
-        <div id="timerBox" class="timer"><small>TIME LEFT</small><strong id="timerText">20:00</strong></div>
+        <div><div class="prog-meta"><span id="qProgress">Question 1 of 30</span><span id="answeredCount">0 answered</span></div><div class="progress"><span id="progressBar"></span></div></div>
+        <div id="timerBox" class="timer"><small>TIME LEFT</small><strong id="timerText">30:00</strong></div>
       </div>
     </header>
     <main class="quiz-page">
@@ -79,6 +80,7 @@
   <main id="performanceScreen" class="page hidden"></main>
 </div>
 <div id="modalRoot"></div><div id="toastRoot"></div>
+<script src="./policy.js"></script>
 <script src="./free-bank.js"></script><script src="./bank-1.js"></script><script src="./bank-2.js"></script><script src="./bank-3.js"></script><script src="./bank-4.js"></script><script src="./topics.js"></script><script src="./app.js"></script>
 </body>
 </html>
