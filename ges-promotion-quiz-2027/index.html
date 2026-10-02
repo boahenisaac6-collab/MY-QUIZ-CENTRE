@@ -20,7 +20,7 @@ body::before,.hero::after{content:none!important}.brand-logo{display:none}.year-
 <header class="top-brand"><div class="flagline"></div><div class="brand-inner"><div class="brand-text"><h1>Promotion Exam Preparation Practice</h1><p>Independent practice platform for Ghana Education Service promotion-exam preparation</p></div></div></header>
 <main id="authScreen" class="page">
 <section class="auth-intro"><h2>Prepare. Practise. Improve.</h2><p>Create your practice account and begin with the 30-question practice bank.</p></section>
-<section class="card"><div class="auth-tabs"><button id="showRegister" class="active">Register</button><button id="showLogin">Log in</button></div><div id="authAlert"></div>
+<section class="card"><div class="auth-tabs"><button type="button" id="showRegister" class="active">Register</button><button type="button" id="showLogin">Log in</button></div><div id="authAlert"></div>
 <form id="registerForm"><div class="card-title">Create your practice account</div><div class="field"><label>Full name</label><input id="regName" autocomplete="name" placeholder="Enter your full name" required></div><div class="field"><label>Telephone number</label><input id="regPhone" inputmode="tel" autocomplete="tel" placeholder="e.g. 0240000000" required></div><div class="field"><label>4-digit code</label><input id="regPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="new-password" type="password" placeholder="Create 4 digits" required></div><button class="primary block" type="submit">Register &amp; Continue</button><div class="free-note">After registration, you can practise the 30-question sample bank repeatedly and compare your scores as you improve.</div></form>
 <form id="loginForm" class="hidden"><div class="card-title">Welcome back</div><div class="field"><label>Telephone number</label><input id="loginPhone" inputmode="tel" autocomplete="tel" placeholder="Enter your telephone number" required></div><div class="field"><label>4-digit code</label><input id="loginPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="current-password" type="password" placeholder="Enter your code" required></div><button class="primary block" type="submit">Log in</button></form></section>
 <div class="footer-note">Independent study and revision tool. It is not an official Ghana Education Service examination portal.</div></main>
@@ -28,5 +28,31 @@ body::before,.hero::after{content:none!important}.brand-logo{display:none}.year-
 <section id="quizScreen" class="hidden"><header class="quiz-top"><div class="quiz-bar"><button id="exitQuiz" class="iconbtn">✕</button><div><div class="prog-meta"><span id="qProgress">Question 1 of 30</span><span id="answeredCount">0 answered</span></div><div class="progress"><span id="progressBar"></span></div></div><div id="timerBox" class="timer"><small>TIME LEFT</small><strong id="timerText">30:00</strong></div></div></header><main class="quiz-page"><div id="qTags" class="q-tags"></div><article class="question-card"><div id="qNo" class="qno"></div><div id="qText" class="qtext"></div><div id="options" class="options"></div><div id="explanation" class="explain hidden"></div></article></main><nav class="bottom-nav"><div class="inner"><button id="prevBtn" class="secondary">← Previous</button><button id="nextBtn" class="primary">Next →</button></div></nav></section>
 <main id="resultScreen" class="page hidden"></main><main id="performanceScreen" class="page hidden"></main></div>
 <div id="modalRoot"></div><div id="toastRoot"></div>
-<script src="./free-bank.js?v=20261002b"></script><script src="./bank-1.js?v=20261002b"></script><script src="./bank-2.js?v=20261002b"></script><script src="./bank-3.js?v=20261002b"></script><script src="./bank-4.js?v=20261002b"></script><script src="./topics.js?v=20261002b"></script><script src="./boot.js?v=20261002b"></script>
+<script>
+(function(){
+  function setAuthTab(which){
+    const regBtn=document.getElementById('showRegister');
+    const loginBtn=document.getElementById('showLogin');
+    const regForm=document.getElementById('registerForm');
+    const loginForm=document.getElementById('loginForm');
+    const alertBox=document.getElementById('authAlert');
+    if(!regBtn||!loginBtn||!regForm||!loginForm)return;
+    const login=which==='login';
+    regForm.classList.toggle('hidden',login);
+    loginForm.classList.toggle('hidden',!login);
+    regBtn.classList.toggle('active',!login);
+    loginBtn.classList.toggle('active',login);
+    if(alertBox)alertBox.innerHTML='';
+    setTimeout(()=>{(login?document.getElementById('loginPhone'):document.getElementById('regName'))?.focus({preventScroll:true});},30);
+  }
+  window.__setAuthTab=setAuthTab;
+  document.addEventListener('click',function(e){
+    const t=e.target.closest('#showLogin,#showRegister');
+    if(!t)return;
+    e.preventDefault();e.stopPropagation();
+    setAuthTab(t.id==='showLogin'?'login':'register');
+  },true);
+})();
+</script>
+<script src="./free-bank.js?v=20261002c"></script><script src="./bank-1.js?v=20261002c"></script><script src="./bank-2.js?v=20261002c"></script><script src="./bank-3.js?v=20261002c"></script><script src="./bank-4.js?v=20261002c"></script><script src="./topics.js?v=20261002c"></script><script src="./boot.js?v=20261002c"></script>
 </body></html>
