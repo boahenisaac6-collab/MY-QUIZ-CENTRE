@@ -1,111 +1,109 @@
 (()=>{
   const nativeFetch=window.fetch.bind(window);
-  let accountStatus='free', currentUser=null;
-  const KEY='promo_free_history_v2';
-  const MOMO='0248481762', MOMO_NAME='ISAAC BOAHEN', WA='233248481762';
-  const getHistory=()=>{try{return JSON.parse(localStorage.getItem(KEY+'_'+(currentUser?.id||'guest'))||'[]')}catch{return[]}};
-  const saveHistory=(rows)=>localStorage.setItem(KEY+'_'+(currentUser?.id||'guest'),JSON.stringify(rows.slice(-100)));
-  const settings=(s={})=>Object.assign(s,{free_sizes:'30',subscription_price:'30',contact_name:'Sir Isaac',contact_phone:'0248481762',momo_number:MOMO,momo_account_name:MOMO_NAME});
-  const responseLike=(response,data,status=response.status)=>new Response(JSON.stringify(data),{status,statusText:response.statusText,headers:response.headers});
+  const MOMO='0248481762';
+  const MOMO_DISPLAY='0248 481 762';
+  const MOMO_NAME='ISAAC BOAHEN';
+  const WA='233248481762';
+  let accountStatus='free';
+  let currentUser=null;
+  let lastPopupSignature='';
 
-  function addFreeResult(data){
-    const rows=getHistory();
-    const previous=rows.length?rows[rows.length-1].percentage:null;
-    rows.push({
-      id:'free-'+Date.now(),question_count:Number(data.total||30),score:Number(data.score||0),
-      total_answered:Number(data.answered||30),duration_seconds:Number(data.durationSeconds||0),
-      started_at:new Date().toISOString(),completed_at:new Date().toISOString(),timed_out:false,
-      rank_filter:'Sample Bank',topic_filter:'30-Question Practice',percentage:Number(data.percentage||0)
-    });
-    saveHistory(rows);
-    data.freePreviousPercentage=previous;
-    data.freeImprovement=previous===null?0:Number(data.percentage||0)-previous;
-  }
-
-  function freePerformance(){
-    const attempts=getHistory();
-    const p=attempts.map(x=>Number(x.percentage||0));
-    const first=p[0]||0,latest=p[p.length-1]||0;
-    return {attempts,summary:{attempts:p.length,average:p.length?Math.round(p.reduce((a,b)=>a+b,0)/p.length):0,best:p.length?Math.max(...p):0,first,latest,improvement:p.length>1?latest-first:0}};
-  }
-
-  function paymentPopup(result){
-    const root=document.getElementById('modalRoot'); if(!root||accountStatus==='approved')return;
-    const history=getHistory(),prev=history.length>1?history[history.length-2].percentage:null;
-    const imp=prev===null?'This is your first recorded practice.':`${result.percentage-prev>=0?'+':''}${result.percentage-prev}% compared with your previous practice.`;
-    const name=encodeURIComponent(currentUser?.fullName||currentUser?.full_name||'');
-    const phone=encodeURIComponent(currentUser?.phone||'');
-    const msg=encodeURIComponent(`Hello Sir Isaac, I want full access to the Promotion Exam Preparation Practice platform. My name is ${decodeURIComponent(name)||'________'} and my phone number is ${decodeURIComponent(phone)||'________'}. I am paying GH₵30 to MTN MoMo ${MOMO} (${MOMO_NAME}). Please activate my full access.`);
-    root.innerHTML=`<div class="modal-backdrop" id="upgradeBackdrop"><div class="modal" style="border-top:7px solid #ffdd00">
-      <div class="handle"></div>
-      <div style="text-align:center;font-size:2.6rem">🎉</div>
-      <h3 style="text-align:center">Well done! Practice completed</h3>
-      <p style="text-align:center">You completed the 30-question sample practice with <strong>${result.score}/${result.total} (${result.percentage}%)</strong>.<br>${imp}</p>
-      <div style="background:#eef9f2;border:1px solid #cfe8d8;border-radius:16px;padding:14px;margin:14px 0">
-        <div style="font-weight:950;color:#034d2b;margin-bottom:7px">Continue with the full practice bank</div>
-        <div style="font-size:.9rem;line-height:1.5;color:#53645b">For flexible question numbers, the full question bank, full performance features and PDF/printing access, activate full access.</div>
-      </div>
-      <div style="background:linear-gradient(135deg,#fff9cf,#fff3a7);border:2px solid #ffdd00;border-radius:18px;padding:15px;text-align:center">
-        <div style="font-size:.8rem;font-weight:900;color:#695500">FULL ACCESS FEE</div>
-        <div style="font-size:2.35rem;font-weight:1000;color:#034d2b">GH₵30</div>
-        <div style="margin-top:9px;font-size:.78rem;font-weight:900">MTN MOBILE MONEY</div>
-        <div style="font-size:1.55rem;font-weight:1000;letter-spacing:.04em;color:#111">0248 481 762</div>
-        <div style="font-weight:900;color:#4b574f">ISAAC BOAHEN</div>
-        <button id="copyMomo" class="secondary block" style="margin-top:10px;min-height:43px">📋 Copy MoMo Number</button>
-      </div>
-      <a href="https://wa.me/${WA}?text=${msg}" target="_blank" rel="noopener" class="primary block" style="margin-top:12px;display:flex;align-items:center;justify-content:center;text-decoration:none;gap:8px">🟢 WhatsApp Sir Isaac</a>
-      <button id="keepFree" class="secondary block" style="margin-top:8px">Continue with Free 30-Question Practice</button>
-    </div></div>`;
-    document.getElementById('copyMomo')?.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(MOMO);alert('MoMo number copied: '+MOMO)}catch{prompt('Copy the MoMo number:',MOMO)}});
-    document.getElementById('keepFree')?.addEventListener('click',()=>{root.innerHTML=''});
-  }
-
-  window.fetch=async function(input,init={}){
-    let action='',body=null,nextInit=init;
-    try{if(init&&typeof init.body==='string'){body=JSON.parse(init.body);action=String(body.action||'');if(action==='start_attempt'&&accountStatus!=='approved'){body.count=30;body.rank='All';body.topic='All';nextInit={...init,body:JSON.stringify(body)}}}}catch(_e){}
-
-    if(action==='performance'&&accountStatus!=='approved'){
-      return new Response(JSON.stringify(freePerformance()),{status:200,headers:{'Content-Type':'application/json'}});
+  const withSettings=(data)=>{
+    if(!data || typeof data!=='object') return data;
+    if(data.user){
+      currentUser=data.user;
+      accountStatus=data.user.status||accountStatus;
     }
-
-    const response=await nativeFetch(input,nextInit);
-    try{
-      const data=await response.clone().json();
-      if(data?.user){currentUser=data.user;accountStatus=data.user.status||accountStatus;}
-      if(action==='public_config'){data.freeSizes=[30];data.settings=settings(data.settings||{});return responseLike(response,data)}
-      if(data?.settings)data.settings=settings(data.settings);
-      if(action==='submit_attempt'&&accountStatus!=='approved'&&response.ok){addFreeResult(data);data.paywall=false;setTimeout(()=>paymentPopup(data),650);return responseLike(response,data)}
-      if(action==='start_attempt'&&response.status===402&&accountStatus!=='approved'){
-        /* Backend may still have an old free-use flag; retry once because the sample bank is permanently reusable. */
-        const retryBody={...(body||{}),action:'start_attempt',count:30,rank:'All',topic:'All'};
-        return nativeFetch(input,{...init,body:JSON.stringify(retryBody)});
-      }
-      if(data?.settings)return responseLike(response,data);
-    }catch(_e){}
-    return response;
+    if(data.settings){
+      data.settings.free_sizes='30';
+      data.settings.subscription_price='30';
+      data.settings.contact_name='Sir Isaac';
+      data.settings.contact_phone=MOMO;
+      data.settings.momo_number=MOMO;
+      data.settings.momo_account_name=MOMO_NAME;
+    }
+    if(Array.isArray(data.freeSizes)) data.freeSizes=[30];
+    return data;
   };
+
+  window.fetch=async function(input,init){
+    const response=await nativeFetch(input,init);
+    try{
+      const cloned=response.clone();
+      const data=withSettings(await cloned.json());
+      return new Response(JSON.stringify(data),{
+        status:response.status,
+        statusText:response.statusText,
+        headers:response.headers
+      });
+    }catch(_e){
+      return response;
+    }
+  };
+
+  function extractScore(){
+    const root=document.getElementById('resultScreen');
+    if(!root || root.classList.contains('hidden')) return null;
+    const text=root.innerText||'';
+    const pctMatch=text.match(/(\d{1,3})\s*%/);
+    const fractionMatch=text.match(/(\d+)\s*\/\s*(30|[1-9]\d{1,2})/);
+    const pct=pctMatch?Number(pctMatch[1]):null;
+    const score=fractionMatch?Number(fractionMatch[1]):null;
+    const total=fractionMatch?Number(fractionMatch[2]):30;
+    if(total!==30) return null;
+    return {pct:pct??(score!==null?Math.round(score/30*100):0),score:score??0,total:30};
+  }
+
+  function showUpgradePopup(result){
+    if(accountStatus==='approved') return;
+    const signature=`${result.score}-${result.pct}-${Date.now().toString().slice(0,-3)}`;
+    if(lastPopupSignature && lastPopupSignature.startsWith(`${result.score}-${result.pct}-`)) return;
+    lastPopupSignature=signature;
+    const root=document.getElementById('modalRoot');
+    if(!root) return;
+    const fullName=(currentUser?.fullName||currentUser?.full_name||'').trim();
+    const phone=(currentUser?.phone||'').trim();
+    const msg=encodeURIComponent(`Hello Sir Isaac, I have completed the free 30-question practice and I want full access to the Promotion Exam Preparation Practice platform. Name: ${fullName||'________'}. Phone: ${phone||'________'}. I will pay GH₵30 to MTN MoMo ${MOMO_DISPLAY}, ${MOMO_NAME}. Please activate my full access.`);
+    root.innerHTML=`<div class="modal-backdrop"><div class="modal upgrade-modal">
+      <div class="handle"></div>
+      <div class="upgrade-celebrate">🎉</div>
+      <h3>Congratulations!</h3>
+      <p class="upgrade-summary">You have completed the free 30-question practice with <strong>${result.score}/${result.total} (${result.pct}%)</strong>.</p>
+      <div class="upgrade-box">
+        <strong>Ready to continue?</strong>
+        <span>Unlock the full question bank, flexible practice sizes, extended performance tools and PDF/printing features.</span>
+      </div>
+      <div class="momo-card">
+        <small>FULL ACCESS</small>
+        <div class="upgrade-price">GH₵30</div>
+        <div class="momo-label">MTN MOBILE MONEY</div>
+        <div class="momo-number">${MOMO_DISPLAY}</div>
+        <div class="momo-name">${MOMO_NAME}</div>
+        <button type="button" id="copyMomo" class="secondary block">📋 Copy MoMo Number</button>
+      </div>
+      <a class="primary block whatsapp-btn" href="https://wa.me/${WA}?text=${msg}" target="_blank" rel="noopener">🟢 WhatsApp Sir Isaac</a>
+      <button type="button" id="closeUpgrade" class="secondary block">Practise the Free 30 Again</button>
+    </div></div>`;
+    document.getElementById('closeUpgrade')?.addEventListener('click',()=>root.innerHTML='');
+    document.getElementById('copyMomo')?.addEventListener('click',async()=>{
+      try{await navigator.clipboard.writeText(MOMO);alert('MoMo number copied: '+MOMO_DISPLAY)}
+      catch(_e){prompt('Copy the MoMo number:',MOMO_DISPLAY)}
+    });
+  }
 
   function tidy(){
     document.title='Promotion Exam Preparation Practice';
     document.querySelectorAll('.year-badge').forEach(e=>e.remove());
     document.querySelectorAll('.brand-text h1').forEach(e=>e.textContent='Promotion Exam Preparation Practice');
     document.querySelectorAll('.brand-text p').forEach(e=>e.textContent='Independent practice platform for Ghana Education Service promotion-exam preparation');
-    const completed=getHistory().length>0;
-    if(accountStatus!=='approved'&&!completed){
-      document.querySelectorAll('.subscribe-card').forEach(e=>e.style.display='none');
-      document.querySelectorAll('button,a,.card').forEach(e=>{
-        const t=(e.textContent||'').toLowerCase();
-        if(t.includes('subscribe')||t.includes('unlock full access')||t.includes('gh₵30')||t.includes('full access subscription')){
-          if(!e.closest('#modalRoot'))e.style.display='none';
-        }
-      });
+
+    const result=extractScore();
+    if(result && !document.querySelector('#modalRoot .upgrade-modal')){
+      setTimeout(()=>showUpgradePopup(result),350);
     }
-    document.querySelectorAll('.note,p,small,span,div').forEach(el=>{
-      if(el.children.length)return;let t=el.textContent||'';
-      t=t.replace(/20\s*(or|\/|&)\s*30/gi,'30').replace(/GES Promotion Quiz 2027/gi,'Promotion Exam Preparation Practice');
-      if(t!==el.textContent)el.textContent=t;
-    });
   }
-  new MutationObserver(tidy).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+
+  const observer=new MutationObserver(()=>tidy());
+  observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
   document.addEventListener('DOMContentLoaded',tidy);
 })();
