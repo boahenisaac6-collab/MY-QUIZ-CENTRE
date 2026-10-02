@@ -10,66 +10,23 @@
 <link rel="stylesheet" href="./styles.css">
 <style>
 body::before,.hero::after{content:none!important}.brand-logo{display:none}.year-badge{display:none}.brand-inner{padding:16px 14px}.brand-text h1{font-size:1.2rem}.auth-intro{padding:16px 2px 8px}.auth-intro h2{margin:0 0 6px;font-size:1.35rem;color:#034d2b}.auth-intro p{margin:0;color:#63717a;line-height:1.5}.free-note{margin-top:10px;padding:11px 12px;border-radius:13px;background:#eef9f2;border:1px solid #d8ecdf;color:#335447;font-size:.86rem;line-height:1.45}.footer-note{text-align:center;color:#718078;font-size:.75rem;line-height:1.45;padding:6px 12px 18px}
-
-/* Harmonious question screen */
 #quizScreen{background:linear-gradient(180deg,#f4f8f5 0,#eef4f0 100%);min-height:100vh}.quiz-top{position:sticky;top:0}.quiz-bar{max-width:720px;padding:9px 10px;grid-template-columns:40px minmax(0,1fr) 88px}.quiz-page{max-width:720px;padding:10px 9px 96px}.q-tags{margin:0 2px 7px;gap:5px}.tag{font-size:.64rem;padding:4px 7px}.question-card{border-radius:18px;padding:14px 12px;box-shadow:0 8px 22px rgba(12,44,28,.08)}.qno{font-size:.7rem;margin-bottom:5px}.qtext{font-size:clamp(1rem,2.7vw,1.12rem);line-height:1.5;margin-bottom:11px;overflow-wrap:anywhere}.options{gap:8px}.option{min-height:54px;grid-template-columns:36px minmax(0,1fr) auto;gap:8px;border-radius:14px;padding:9px 9px}.option .letter{width:32px;height:32px;border-radius:10px}.option .otxt{font-size:clamp(.91rem,2.4vw,.98rem);line-height:1.38;overflow-wrap:anywhere}.mark{font-size:.66rem}.explain{font-size:.84rem;line-height:1.46;margin-top:10px}.bottom-nav{padding:7px 9px calc(7px + env(safe-area-inset-bottom))}.bottom-nav .inner{max-width:720px;grid-template-columns:.92fr 1.25fr}.bottom-nav button{min-height:48px}.timer{padding:6px}.timer strong{font-size:.92rem}.prog-meta{font-size:.68rem;gap:5px}.progress{height:6px}
-.upgrade-modal{text-align:center;border-top:7px solid #ffdd00}.upgrade-celebrate{font-size:2.4rem}.upgrade-summary{margin-bottom:12px}.upgrade-box{background:#eef9f2;border:1px solid #cfe8d8;border-radius:15px;padding:13px;text-align:left;display:grid;gap:5px;margin-bottom:12px}.upgrade-box strong{color:#034d2b}.upgrade-box span{font-size:.86rem;color:#53645b;line-height:1.45}.momo-card{background:linear-gradient(135deg,#fff9cf,#fff3a7);border:2px solid #ffdd00;border-radius:18px;padding:14px}.momo-card small,.momo-label{font-weight:900;color:#695500}.upgrade-price{font-size:2.2rem;font-weight:1000;color:#034d2b}.momo-label{font-size:.76rem;margin-top:7px}.momo-number{font-size:1.5rem;font-weight:1000;letter-spacing:.035em;color:#111}.momo-name{font-weight:900;color:#4b574f;margin-bottom:9px}.whatsapp-btn{display:flex!important;align-items:center;justify-content:center;text-decoration:none;gap:7px;margin-top:10px}.upgrade-modal>#closeUpgrade{margin-top:8px}
-
-@media(max-width:520px){
-  .shell{max-width:100%}.brand-inner{padding:12px 11px}.brand-text h1{font-size:1.02rem;line-height:1.15}.brand-text p{font-size:.7rem;line-height:1.35}.page{padding:10px 9px 72px}.auth-intro{padding:8px 2px}.auth-intro h2{font-size:1.18rem}.card{padding:12px;border-radius:16px}
-  .quiz-bar{grid-template-columns:36px minmax(0,1fr) 78px;gap:6px;padding:8px 7px}.iconbtn{width:36px;height:36px;border-radius:10px}.timer{border-radius:10px}.timer small{font-size:.5rem}.timer strong{font-size:.82rem}.prog-meta{font-size:.62rem}.quiz-page{padding:8px 7px 90px}.question-card{padding:12px 9px;border-radius:15px}.qtext{font-size:.99rem;line-height:1.45}.options{gap:7px}.option{grid-template-columns:33px minmax(0,1fr) auto;gap:7px;min-height:51px;padding:8px 7px;border-radius:12px}.option .letter{width:30px;height:30px}.option .otxt{font-size:.9rem;line-height:1.34}.mark{font-size:.6rem}.bottom-nav .inner{gap:7px}.bottom-nav button{min-height:46px;padding:0 9px;font-size:.88rem}.modal-backdrop{padding:7px}.modal{padding:14px;border-radius:20px 20px 14px 14px}.momo-number{font-size:1.38rem}
-}
+@media(max-width:520px){.shell{max-width:100%}.brand-inner{padding:12px 11px}.brand-text h1{font-size:1.02rem;line-height:1.15}.brand-text p{font-size:.7rem;line-height:1.35}.page{padding:10px 9px 72px}.auth-intro{padding:8px 2px}.auth-intro h2{font-size:1.18rem}.card{padding:12px;border-radius:16px}.quiz-bar{grid-template-columns:36px minmax(0,1fr) 78px;gap:6px;padding:8px 7px}.iconbtn{width:36px;height:36px;border-radius:10px}.timer{border-radius:10px}.timer small{font-size:.5rem}.timer strong{font-size:.82rem}.prog-meta{font-size:.62rem}.quiz-page{padding:8px 7px 90px}.question-card{padding:12px 9px;border-radius:15px}.qtext{font-size:.99rem;line-height:1.45}.options{gap:7px}.option{grid-template-columns:33px minmax(0,1fr) auto;gap:7px;min-height:51px;padding:8px 7px;border-radius:12px}.option .letter{width:30px;height:30px}.option .otxt{font-size:.9rem;line-height:1.34}.mark{font-size:.6rem}.bottom-nav .inner{gap:7px}.bottom-nav button{min-height:46px;padding:0 9px;font-size:.88rem}.modal-backdrop{padding:7px}.modal{padding:14px;border-radius:20px 20px 14px 14px}}
 @media(min-width:900px){.question-card{padding:20px 18px}.qtext{font-size:1.14rem}.option{min-height:58px;padding:11px}}
 </style>
 </head>
 <body>
 <div class="shell" id="app">
-  <header class="top-brand">
-    <div class="flagline"></div>
-    <div class="brand-inner">
-      <div class="brand-text"><h1>Promotion Exam Preparation Practice</h1><p>Independent practice platform for Ghana Education Service promotion-exam preparation</p></div>
-    </div>
-  </header>
-
-  <main id="authScreen" class="page">
-    <section class="auth-intro">
-      <h2>Prepare. Practise. Improve.</h2>
-      <p>Create your practice account and begin with the 30-question practice bank.</p>
-    </section>
-    <section class="card">
-      <div class="auth-tabs"><button id="showRegister" class="active">Register</button><button id="showLogin">Log in</button></div>
-      <div id="authAlert"></div>
-      <form id="registerForm">
-        <div class="card-title">Create your practice account</div>
-        <div class="field"><label>Full name</label><input id="regName" autocomplete="name" placeholder="Enter your full name" required></div>
-        <div class="field"><label>Telephone number</label><input id="regPhone" inputmode="tel" autocomplete="tel" placeholder="e.g. 0240000000" required></div>
-        <div class="field"><label>4-digit code</label><input id="regPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="new-password" type="password" placeholder="Create 4 digits" required></div>
-        <button class="primary block" type="submit">Register &amp; Continue</button>
-        <div class="free-note">After registration, you can practise the 30-question sample bank repeatedly and compare your scores as you improve.</div>
-      </form>
-      <form id="loginForm" class="hidden">
-        <div class="card-title">Welcome back</div>
-        <div class="field"><label>Telephone number</label><input id="loginPhone" inputmode="tel" autocomplete="tel" placeholder="Enter your telephone number" required></div>
-        <div class="field"><label>4-digit code</label><input id="loginPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="current-password" type="password" placeholder="Enter your code" required></div>
-        <button class="primary block" type="submit">Log in</button>
-      </form>
-    </section>
-    <div class="footer-note">Independent study and revision tool. It is not an official Ghana Education Service examination portal.</div>
-  </main>
-
-  <main id="dashboardScreen" class="page hidden"></main>
-
-  <section id="quizScreen" class="hidden">
-    <header class="quiz-top"><div class="quiz-bar"><button id="exitQuiz" class="iconbtn">✕</button><div><div class="prog-meta"><span id="qProgress">Question 1 of 30</span><span id="answeredCount">0 answered</span></div><div class="progress"><span id="progressBar"></span></div></div><div id="timerBox" class="timer"><small>TIME LEFT</small><strong id="timerText">30:00</strong></div></div></header>
-    <main class="quiz-page"><div id="qTags" class="q-tags"></div><article class="question-card"><div id="qNo" class="qno"></div><div id="qText" class="qtext"></div><div id="options" class="options"></div><div id="explanation" class="explain hidden"></div></article></main>
-    <nav class="bottom-nav"><div class="inner"><button id="prevBtn" class="secondary">← Previous</button><button id="nextBtn" class="primary">Next →</button></div></nav>
-  </section>
-
-  <main id="resultScreen" class="page hidden"></main>
-  <main id="performanceScreen" class="page hidden"></main>
-</div>
+<header class="top-brand"><div class="flagline"></div><div class="brand-inner"><div class="brand-text"><h1>Promotion Exam Preparation Practice</h1><p>Independent practice platform for Ghana Education Service promotion-exam preparation</p></div></div></header>
+<main id="authScreen" class="page">
+<section class="auth-intro"><h2>Prepare. Practise. Improve.</h2><p>Create your practice account and begin with the 30-question practice bank.</p></section>
+<section class="card"><div class="auth-tabs"><button id="showRegister" class="active">Register</button><button id="showLogin">Log in</button></div><div id="authAlert"></div>
+<form id="registerForm"><div class="card-title">Create your practice account</div><div class="field"><label>Full name</label><input id="regName" autocomplete="name" placeholder="Enter your full name" required></div><div class="field"><label>Telephone number</label><input id="regPhone" inputmode="tel" autocomplete="tel" placeholder="e.g. 0240000000" required></div><div class="field"><label>4-digit code</label><input id="regPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="new-password" type="password" placeholder="Create 4 digits" required></div><button class="primary block" type="submit">Register &amp; Continue</button><div class="free-note">After registration, you can practise the 30-question sample bank repeatedly and compare your scores as you improve.</div></form>
+<form id="loginForm" class="hidden"><div class="card-title">Welcome back</div><div class="field"><label>Telephone number</label><input id="loginPhone" inputmode="tel" autocomplete="tel" placeholder="Enter your telephone number" required></div><div class="field"><label>4-digit code</label><input id="loginPin" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="current-password" type="password" placeholder="Enter your code" required></div><button class="primary block" type="submit">Log in</button></form></section>
+<div class="footer-note">Independent study and revision tool. It is not an official Ghana Education Service examination portal.</div></main>
+<main id="dashboardScreen" class="page hidden"></main>
+<section id="quizScreen" class="hidden"><header class="quiz-top"><div class="quiz-bar"><button id="exitQuiz" class="iconbtn">✕</button><div><div class="prog-meta"><span id="qProgress">Question 1 of 30</span><span id="answeredCount">0 answered</span></div><div class="progress"><span id="progressBar"></span></div></div><div id="timerBox" class="timer"><small>TIME LEFT</small><strong id="timerText">30:00</strong></div></div></header><main class="quiz-page"><div id="qTags" class="q-tags"></div><article class="question-card"><div id="qNo" class="qno"></div><div id="qText" class="qtext"></div><div id="options" class="options"></div><div id="explanation" class="explain hidden"></div></article></main><nav class="bottom-nav"><div class="inner"><button id="prevBtn" class="secondary">← Previous</button><button id="nextBtn" class="primary">Next →</button></div></nav></section>
+<main id="resultScreen" class="page hidden"></main><main id="performanceScreen" class="page hidden"></main></div>
 <div id="modalRoot"></div><div id="toastRoot"></div>
-<script src="./policy.js"></script>
 <script src="./free-bank.js"></script><script src="./bank-1.js"></script><script src="./bank-2.js"></script><script src="./bank-3.js"></script><script src="./bank-4.js"></script><script src="./topics.js"></script><script src="./app.js"></script>
-</body>
-</html>
+</body></html>
