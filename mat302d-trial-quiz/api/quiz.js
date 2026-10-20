@@ -28,7 +28,9 @@ module.exports = async function handler(req,res) {
     const upstream = await fetch(url.toString(),{
       method:req.method,headers,body,redirect:'manual',signal:AbortSignal.timeout(20000)
     });
-    const clearCookies = upstream.headers.getSetCookie?.() || [];
+    const clearCookies = typeof upstream.headers.getSetCookie === 'function'
+      ? upstream.headers.getSetCookie()
+      : upstream.headers.get('set-cookie') ? [upstream.headers.get('set-cookie')] : [];
     for(const item of clearCookies) {
       if(COOKIE_PATTERN.test(item)) {
         res.setHeader('Set-Cookie',item.replace(/Path=\/functions\/v1\/mat302d-access/ig,'Path=/api/quiz'));
@@ -38,13 +40,20 @@ module.exports = async function handler(req,res) {
     res.setHeader('X-Content-Type-Options','nosniff');
     res.setHeader('X-Frame-Options','DENY');
     if(upstream.status >= 300 && upstream.status < 400) {
-      const dest = upstream.headers.get('location');
-      if(!dest) return res.status(502).send('Invalid upstream redirect');
-      const target = new URL(dest,UPSTREAM);
-      if(target.origin !== new URL(UPSTREAM).origin ||
-         target.pathname !== new URL(UPSTREAM).pathname) return res.status(502).send('Unsafe upstream redirect');
-      res.setHeader('Location','/api/quiz' + target.search);
-      return res.status(upstream.status).end();
+      // Never use untrusted upstream Location headers as browser destinations.
+      // The Edge Function returns 303 after these four form actions.
+      // Translate each action to its one fixed same-origin destination.
+      const action = inbound.searchParams.get('action');
+      const allowedDestination = ({
+        'admin-login':'/api/quiz?admin=1',
+        'save':'/api/quiz?admin=1',
+        'logout':'/api/quiz?admin=1',
+        'student':'/api/quiz'
+      })[action];
+      if(upstream.status !== 303 || req.method !== 'POST' || !allowedDestination)
+        return res.status(502).send('Unexpected upstream redirect');
+      res.setHeader('Location', allowedDestination);
+      return res.status(303).end();
     }
     const response = await upstream.text();
     const typ = upstream.headers.get('content-type') || '';
