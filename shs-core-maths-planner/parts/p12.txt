@@ -4713,7 +4713,7 @@ function appendVerifiedSTP(doc,settings){
   $('#guidedNext').addEventListener('click',async()=>{
     const problem=guidedValidate();if(problem){guidedError(problem);return;}
     if(guidedStep<6){guidedShow(guidedStep+1);return;}
-    if (!(await window.CMLP.guardGeneration(weekInfo(guidedWeek)?.w?.w || 0))) return;
+    if (!(await window.CMLP.guardGeneration(guidedWeek))) return;
     // The first visible generation happens only after the final confirmation.
     guidedSync();
     document.body.classList.remove('guided-setup','guided-power');
@@ -4753,4 +4753,4 @@ function appendVerifiedSTP(doc,settings){
   if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});
 })();
 </script>
-<script src="access.js?v=20261021b"></script></body></html>
+<script src="access.js?v=20261021c"></script></body></html>
