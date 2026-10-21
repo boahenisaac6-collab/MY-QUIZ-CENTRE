@@ -2387,7 +2387,7 @@ function appendVerifiedSTP(doc,settings){
       assessment:[],reflection:[B.note('Teacher copy: check the questions and any supplied marking information before giving learners the exercise.')],
       summary:d.summary};
   }
-  async async function wsExportAssessment(fmt){
+  async function wsExportAssessment(fmt){
     if (!(await window.CoreMathsGate.allow('export', E.week))) return;
     if(!current||!lay)return;
     const status=$('#wsAssessStatus'),btn=$('#wsAssess'+(fmt==='pdf'?'PDF':'Word'));btn.disabled=true;status.textContent='Generating assessment '+fmt.toUpperCase()+'…';
