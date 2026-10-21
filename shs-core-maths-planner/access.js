@@ -47,7 +47,7 @@ const styles=document.createElement("style");
 styles.textContent='.gate-public-banner{background:#fff9e8;color:#554010;border:1px solid #e0c584;border-left:5px solid #be8624;padding:15px 17px;border-radius:14px;margin:0 0 16px;font:700 13.5px/1.65 system-ui;box-shadow:0 6px 18px #29200612}.guided-week[data-gate-access="free"]{border-color:#55a27e!important;background:color-mix(in srgb,#dcf4e4 32%,var(--surface-2))}.guided-week[data-gate-access="restricted"]{border-color:#c6bbc7;opacity:.86}.guided-week .gate-week-label{display:block;font-size:11px;font-weight:850;margin-top:3px}.guided-week[data-gate-access="free"] .gate-week-label{color:#14663d}.guided-week[data-gate-access="restricted"] .gate-week-label{color:#9a5614}.guided-choice .gate-year-label{display:block;font-size:11.5px;font-weight:800;color:var(--accent);grid-column:2}.wk[data-gate-access="restricted"]{background:#f2e9eb;border-color:#ad8e9e!important}.wk[data-gate-access="free"]{box-shadow:0 0 0 2px #56b486 inset}';
 document.head.append(styles);
 function markPolicy(){
- if(config?.mode==="free"||!config){banner.hidden=true;}else{banner.hidden=false;banner.textContent=policyText();}
+ if(config?.mode==="free"||!config){banner.hidden=true;}else{banner.hidden=false;banner.textContent=status==="approved"?"✓ Your subscription is approved. All years, weeks, and document downloads are unlocked.":policyText();}
  document.querySelectorAll("[data-gweek],[data-week]").forEach(btn=>{
    const id=btn.dataset.gweek||btn.dataset.week;
    const label=canPlan(id)?"✓ Free to plan":"🔒 Subscription required";
@@ -56,7 +56,7 @@ function markPolicy(){
    if(btn.hasAttribute("data-gweek")){
      let span=btn.querySelector(".gate-week-label");
      if(!span){span=document.createElement("span");span.className="gate-week-label";const last=btn.querySelector("small");(last?.parentElement||btn).append(span);}
-     const expected=config?.mode==="free"?"✓ Available":label;
+     const expected=status==="approved"?"✓ Unlocked":config?.mode==="free"?"✓ Available":label;
      if(span.textContent!==expected)span.textContent=expected;
    }
  });
