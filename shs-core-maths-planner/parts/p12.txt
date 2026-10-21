@@ -4276,10 +4276,11 @@ function appendVerifiedSTP(doc,settings){
     }
   }
   $$('.dl').forEach(b => b.addEventListener('click', () => download(b.dataset.fmt)));
-  window.__files = async () => ({ docx: await buildFile('docx'), pdf: await buildFile('pdf') });
+  window.__files = async () => { if (!(await window.CMLP.guardExport())) throw Error('Subscription approval required'); return {docx:await buildFile('docx'),pdf:await buildFile('pdf')}; };
   window.__plannerTest = { ensureWeek, weekInfo, getState: () => ({ week: E.week, previewWeek: current && current.week, pageCount: lay && lay.pages.length }), getPackCount: () => document.querySelectorAll('script[id^="pack-"]').length, docJSON: () => current ? JSON.stringify({ ...current, summary: null }) : null };
 
   async function copyForWord() {
+    if (!(await window.CMLP.guardExport())) return;
     const d = current; if (!d) return;
     const html = `<html><body>${PASTE.planner(d)}</body></html>`;
     const text = Smart.plain(d);
@@ -4474,6 +4475,7 @@ function appendVerifiedSTP(doc,settings){
       summary:d.summary};
   }
   async function wsExportAssessment(fmt){
+    if (!(await window.CMLP.guardExport())) return;
     if(!current||!lay)return;
     const status=$('#wsAssessStatus'),btn=$('#wsAssess'+(fmt==='pdf'?'PDF':'Word'));btn.disabled=true;status.textContent='Generating assessment '+fmt.toUpperCase()+'…';
     try{
