@@ -1,13 +1,114 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sir Isaac | Mathematics Planner Admin</title>
-<style>*{box-sizing:border-box}body{font:15px/1.5 system-ui,Arial;background:#f4f0f6;color:#211e27;margin:0}header{background:#391137;color:#fff;padding:26px max(18px,calc((100vw - 1150px)/2))}h1{margin:0;font-size:25px}header p{margin:3px 0;color:#e6cee3}.wrap{max-width:1150px;margin:25px auto;padding:0 15px}.card{background:#fff;border:1px solid #dfd6e0;border-radius:16px;padding:22px;margin:15px 0;box-shadow:0 8px 25px #39283e10}label{display:block;font-weight:700;margin:12px 0 7px}input,select{padding:12px;border:1px solid #cbbdca;border-radius:10px;width:100%;font:inherit}button{border:0;border-radius:10px;background:#6d1b63;color:white;font-weight:700;padding:11px 15px;cursor:pointer;margin:4px}button.alt{background:#efe7ef;color:#491344}button.reject{background:#b23434}button:disabled{opacity:.45}p.note{color:#6a5d68}#msg{min-height:20px;font-weight:700;color:#751c5b}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:720px}th,td{padding:12px;text-align:left;border-bottom:1px solid #e8e1e8}th{background:#f4edf4}.status{font-weight:800;text-transform:capitalize}.approved{color:#087544}.pending{color:#955800}.rejected,.revoked{color:#b23434}small{color:#655d68}a{color:#68185e}</style></head><body>
-<header><h1>SHS Core Mathematics Lesson Planner</h1><p>Subscription Control Centre · Prepared by Sir Isaac Boahen</p></header><div class="wrap">
-<div class="card" id="login"><h2>Administrator sign in</h2><p class="note">This control centre is private. Enter the admin password supplied separately.</p><label for="pw">Admin password</label><input id="pw" type="password" autocomplete="off"><button id="signin">Sign in</button></div>
-<div id="panel" hidden><div class="card"><h2>Subscription settings</h2><div class="grid"><div><label for="mode">Access mode</label><select id="mode"><option value="free">Free — all lessons and downloads</option><option value="print">Paid printing — generate freely</option><option value="week1">Week 1 trial — pay to unlock remaining weeks and printing</option><option value="locked">Entire planner locked until approved</option></select></div><div><label for="price">Subscription amount (GH₵)</label><input id="price" type="number" min="0" max="10000" value="100"></div><div><label>MTN MoMo number</label><input value="0248 481 1762" disabled></div></div><p class="note">Free mode shows no subscription prompt. All other modes require your manual approval before downloading Word or PDF. Payment verification is not automatic.</p><button id="save">Save settings for everyone</button><button class="alt" id="refresh">Refresh requests</button> <a href="./" target="_blank" rel="noopener">Open public planner</a></div><div class="card"><h2>Teacher subscription requests</h2><p class="note">Confirm payment in your own MTN transaction history before approving. Approvals apply to the requesting browser/device.</p><div class="table-wrap"><table><thead><tr><th>Teacher</th><th>Phone</th><th>Status</th><th>Requested</th><th>Manage</th></tr></thead><tbody id="users"></tbody></table></div></div></div><p id="msg" role="status"></p></div>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1b4439"><title>Isaac Admin | SHS Core Mathematics Lesson Planner</title>
+<style>
+:root{color-scheme:light;--forest:#1c4b3e;--forest2:#11392e;--gold:#e2b54a;--bg:#f4f6f3;--surface:#fff;--text:#20352e;--muted:#60736b;--line:#dce5de;--red:#af3540}
+*{box-sizing:border-box}body{margin:0;font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}
+header{background:radial-gradient(circle at 90% 15%,#34705c,var(--forest2));color:white;border-bottom:7px solid var(--gold);padding:26px max(18px,calc((100vw - 1200px)/2));}header h1{font-size:clamp(22px,3vw,31px);margin:5px 0}header p{margin:0;color:#cee6d9}header .pretitle{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--gold);font-weight:900}
+.wrap{max-width:1200px;padding:0 15px;margin:24px auto 50px}.card{background:var(--surface);border:1px solid var(--line);border-radius:19px;padding:23px;box-shadow:0 9px 28px #0e3d2811;margin-bottom:19px}
+h2{font-size:21px;margin:0 0 7px}h3{font-size:15px;margin:0 0 6px}p{margin:7px 0 12px}.muted{color:var(--muted)}small{color:var(--muted)}
+input,select{display:block;width:100%;border:1.5px solid #c8d7cd;border-radius:11px;padding:12px;background:white;color:var(--text);font-size:15px}
+input:focus,select:focus,button:focus-visible{outline:3px solid #c0ddcf;outline-offset:2px}
+label{display:block;font-weight:750;margin:12px 0 6px}
+.btn{border:0;padding:11px 16px;border-radius:11px;background:var(--forest);color:white;font-weight:800;min-height:43px}
+.btn.secondary{background:#edf3ef;color:var(--forest);border:1px solid var(--line)}
+.btn.danger{background:#a6323e}.btn.small{padding:8px 10px;min-height:34px;font-size:12.5px}
+.flex{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#login{max-width:510px;margin:50px auto}#login button{margin-top:16px}
+#toast{border-radius:13px;background:#e9f4eb;border:1px solid #aed5bb;color:#165232;font-size:14px;font-weight:700;padding:13px 16px;margin:0 0 17px}
+#toast[data-kind="error"]{background:#fdefef;color:#8b2631;border-color:#eab5b8}#toast[hidden]{display:none!important}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+.stat{border:1px solid var(--line);background:#fff;padding:18px;border-radius:15px}.stat b{display:block;font-size:31px;line-height:1.15;color:var(--forest)}.stat span{font-size:12.5px;color:var(--muted)}
+.summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:13px 0}.mode-pill{background:#e3f2e6;color:#1b5a38;border-radius:99px;padding:7px 14px;font-weight:800;font-size:13px}#lastSaved{color:var(--muted);font-size:12px}
+.mode-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:15px}
+.mode-choice{display:flex;gap:10px;align-items:flex-start;padding:16px;border:2px solid var(--line);border-radius:15px;cursor:pointer;background:#fbfcfb}
+.mode-choice:has(input:checked){border-color:#268064;background:#edf7f2}
+.mode-choice input{width:19px;height:19px;margin:2px 0 0;accent-color:var(--forest);flex:none}
+.mode-choice strong{display:block;font-size:15px;margin-bottom:4px}.mode-choice small{display:block;font-size:12.5px;line-height:1.55}
+.setting-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}
+.money{padding:13px;border-radius:12px;background:#f6f4ea;border:1px solid #e7dcbd}.money b{font-size:17px}
+.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:15px;margin-top:18px}
+#saveStatus{font-weight:800;color:#1c754b;font-size:14px}#saveStatus.error{color:var(--red)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:17px 0}.tab{border:1px solid var(--line);background:#f0f5f2;color:var(--forest);padding:10px 13px;border-radius:11px;font-weight:800}
+.tab[aria-selected="true"]{background:var(--forest);color:#fff}.count{background:#dbe8e0;color:var(--forest);padding:2px 7px;border-radius:99px;font-size:11px;margin-left:5px}.tab[aria-selected="true"] .count{background:#ecf4ed}
+.table-scroll{overflow:auto;border:1px solid var(--line);border-radius:13px}table{width:100%;border-collapse:collapse;min-width:650px}td,th{text-align:left;padding:13px;border-bottom:1px solid #edf0ec;vertical-align:top}th{background:#edf4ee;text-transform:uppercase;font-size:11px;letter-spacing:.5px;color:#445c51}tbody tr:last-child td{border-bottom:0}
+.name{font-weight:850}.phone{font-variant-numeric:tabular-nums;font-weight:650}.status{font-size:11px;padding:5px 10px;border-radius:99px;font-weight:800;background:#fff0d9;color:#855400}
+.status.approved{background:#e5f5eb;color:#1a673b}.status.rejected,.status.revoked{background:#fde7e7;color:#8f2830}
+.nothing{padding:32px;text-align:center;color:var(--muted)}.hint{background:#f0f4f3;border-left:4px solid var(--forest);padding:13px 16px;border-radius:10px;margin:12px 0;font-size:13.5px}
+.footer{color:var(--muted);text-align:center;font-size:12px;margin:24px auto}
+@media(max-width:650px){.mode-list,.setting-grid,.stats{grid-template-columns:1fr}.card{padding:16px}header{padding:22px 17px}.stat b{font-size:26px}}
+</style></head>
+<body>
+<header><div class="pretitle">Teacher subscription management</div><h1>SHS Core Mathematics Lesson Planner</h1><p>Administrator Control Centre · Prepared by Sir Isaac Boahen</p></header>
+<main class="wrap">
+<section class="card" id="login"><h2>Administrator sign in</h2><p class="muted">Sign in to set access permissions and approve teacher subscriptions.</p><label for="pw">Administrator password</label><input id="pw" type="password" autocomplete="off" placeholder="Enter your password"><button class="btn" type="button" id="signin">Open control centre</button><p id="loginError" role="alert" style="color:var(--red)" hidden></p></section>
+<div id="panel" hidden>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<section class="stats" aria-label="Subscription overview">
+<div class="stat"><b id="pendingCount">0</b><span>Pending payment approvals</span></div>
+<div class="stat"><b id="approvedCount">0</b><span>Approved subscribers</span></div>
+<div class="stat"><b id="inactiveCount">0</b><span>Rejected or revoked</span></div></section>
+<section class="card"><h2>1. Control access for every teacher</h2>
+<p class="muted">Choose how much of the lesson planner teachers can use without paying. The saved mode applies to all users, including teachers who already have the public page open.</p>
+<div class="summary"><span>Currently active:</span><strong class="mode-pill" id="activeMode">Loading…</strong><span id="lastSaved"></span></div>
+<div class="mode-list" id="modeOptions">
+<label class="mode-choice"><input type="radio" name="mode" value="free"><span><strong>Free for everybody</strong><small>All weeks and Word/PDF downloads are free. No subscription or payment messages appear in the public planner.</small></span></label>
+<label class="mode-choice"><input type="radio" name="mode" value="print"><span><strong>Free lesson preparation · Paid downloads</strong><small>Teachers can generate and preview all lessons. Word/PDF printing requires an approved subscription.</small></span></label>
+<label class="mode-choice"><input type="radio" name="mode" value="week1"><span><strong>Week 1 trial only</strong><small>Unsubscribed teachers can generate and preview Week 1 only. Other weeks and all downloads require payment approval.</small></span></label>
+<label class="mode-choice"><input type="radio" name="mode" value="locked"><span><strong>Full lock · Subscription only</strong><small>Unapproved teachers see the subscription screen as soon as the planner opens and cannot proceed. Approved teachers can use all features.</small></span></label>
+</div>
+<div class="setting-grid"><div><label for="price">Subscription fee (GH₵)</label><input id="price" type="number" min="0" max="10000" value="100" step="1"></div><div class="money"><small>MTN Mobile Money payment number</small><br><b>0248 481 1762</b><p class="muted" style="font-size:12px">Verify all payments in your MTN account before approving. The application cannot automatically verify MoMo payments.</p></div></div>
+<div class="actions"><button class="btn" id="save" type="button">Save and apply to public link</button><button class="btn secondary" id="refreshSettings" type="button">Refresh current settings</button><span id="saveStatus" role="status"></span></div>
+</section>
+<section class="card"><div class="flex" style="justify-content:space-between"><div><h2>2. Manage teacher subscriptions</h2><p class="muted">Requests and approved users are kept in separate lists. New requests will display the teacher's name, telephone and date.</p></div><button class="btn secondary" id="refresh" type="button">Refresh teacher lists</button></div>
+<div class="hint"><strong>Approval procedure:</strong> Check the teacher's name and phone number, confirm their GH₵100 payment through MTN, then select <b>Approve</b>. The teacher immediately moves from Pending to Approved.</div>
+<div class="tabs" role="tablist" aria-label="Subscription lists">
+<button class="tab" role="tab" aria-selected="true" data-tab="pending">Pending requests <span class="count" id="badgePending">0</span></button>
+<button class="tab" role="tab" aria-selected="false" data-tab="approved">Approved list <span class="count" id="badgeApproved">0</span></button>
+<button class="tab" role="tab" aria-selected="false" data-tab="inactive">Rejected / revoked <span class="count" id="badgeInactive">0</span></button>
+</div>
+<div class="table-scroll"><table><thead><tr><th>Teacher</th><th>Telephone</th><th>Status</th><th>Request date</th><th>Action</th></tr></thead><tbody id="users"></tbody></table></div><div id="empty" class="nothing" hidden></div>
+</section>
+<div class="flex"><a href="./" target="_blank" rel="noopener" style="color:var(--forest);font-weight:800">Open the public lesson planner ↗</a><button class="btn secondary" id="logout" type="button">Sign out</button></div>
+</div>
+<p class="footer">SHS Core Mathematics Lesson Planner · Teacher access control · Sir Isaac Boahen</p>
+</main>
 <script>
-(()=>{const API="https://dhnrrruishllmnhafjdd.supabase.co/functions/v1/cmlp-access";let secret='';const el=id=>document.getElementById(id);const msg=s=>el('msg').textContent=s;
-async function request(action,data={}){const res=await fetch(API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,admin_password:secret,...data})});const d=await res.json();if(!res.ok)throw Error(d.error||'Server error');return d}
-async function load(){const d=await request('admin_summary');el('mode').value=d.config.mode;el('price').value=d.config.price;const tbody=el('users');tbody.replaceChildren();for(const u of d.users){const tr=document.createElement('tr');for(const s of [u.display_name,u.phone||'—',u.status,new Date(u.created_at).toLocaleString()]){const td=document.createElement('td');td.textContent=s;if(s===u.status)td.className='status '+u.status;tr.append(td)}const td=document.createElement('td');for(const [label,status,css] of [['Approve','approved',''],['Reject','rejected','reject'],['Revoke','revoked','alt']]){const b=document.createElement('button');b.textContent=label;b.className=css;b.disabled=u.status===status;b.onclick=async()=>{try{await request('admin_decide',{token_hash:u.token_hash,status});msg('Updated '+u.display_name+' → '+status);await load()}catch(e){msg(e.message)}};td.append(b)}tr.append(td);tbody.append(tr)}if(!d.users.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=5;td.textContent='No requests yet';tr.append(td);tbody.append(tr)}}
-el('signin').onclick=async()=>{secret=el('pw').value;try{await load();el('login').hidden=true;el('panel').hidden=false;el('pw').value='';msg('Admin access verified.')}catch(e){secret='';msg(e.message)}};
-el('save').onclick=async()=>{try{const d=await request('admin_mode',{mode:el('mode').value,price:Number(el('price').value)});msg('Settings saved: '+d.config.mode+'. These will apply to the public planner.')}catch(e){msg(e.message)}};
-el('refresh').onclick=async()=>{try{await load();msg('Requests refreshed.')}catch(e){msg(e.message)}};})();
+(()=>{
+const API="https://dhnrrruishllmnhafjdd.supabase.co/functions/v1/cmlp-access";
+const el=id=>document.getElementById(id);let secret="",all=[],tab="pending",dirty=false,busy=false;
+const labels={free:"Free for everybody",print:"Paid downloads",week1:"Week 1 trial",locked:"Full lock"};
+const readMode=()=>document.querySelector('input[name="mode"]:checked')?.value||"free";
+function notify(message,kind="success"){const t=el("toast");t.hidden=false;t.dataset.kind=kind;t.textContent=message}
+function stamp(){return new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit"})}
+async function api(action,more={}){const ac=new AbortController();const timeout=setTimeout(()=>ac.abort(),15000);try{const r=await fetch(API,{method:"POST",cache:"no-store",signal:ac.signal,headers:{"content-type":"application/json"},body:JSON.stringify({action,admin_password:secret,...more})});const data=await r.json();if(!r.ok)throw Error(data.error||"Server rejected this request");return data}finally{clearTimeout(timeout)}}
+function setMode(v){const radio=document.querySelector('input[name="mode"][value="'+v+'"]');if(radio)radio.checked=true}
+function applyConfig(c,force=false){el("activeMode").textContent=labels[c.mode]||c.mode;if(!dirty||force){setMode(c.mode);el("price").value=c.price;dirty=false;el("saveStatus").textContent="Settings synchronised";el("saveStatus").className=""}el("lastSaved").textContent="Last checked "+stamp()}
+function bucket(u){return u.status==="pending"?"pending":u.status==="approved"?"approved":"inactive"}
+function counts(){const x={pending:0,approved:0,inactive:0};all.forEach(u=>x[bucket(u)]++);return x}
+function render(){const n=counts();for(const [k,id,small] of [["pending","pendingCount","badgePending"],["approved","approvedCount","badgeApproved"],["inactive","inactiveCount","badgeInactive"]]){el(id).textContent=n[k];el(small).textContent=n[k]}
+document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===tab)));
+const tbody=el("users");tbody.replaceChildren();const records=all.filter(u=>bucket(u)===tab);el("empty").hidden=!!records.length;
+el("empty").textContent=tab==="pending"?"No pending subscription requests.":tab==="approved"?"No approved subscribers yet.":"No rejected or revoked subscribers.";
+for(const u of records){const tr=document.createElement("tr");const add=(s,cls)=>{const c=document.createElement("td");if(cls){const b=document.createElement("span");b.className=cls;b.textContent=s;c.append(b)}else c.textContent=s;tr.append(c);return c};
+add(u.display_name||"Unnamed","name");add(u.phone||"—","phone");add(u.status,"status "+u.status);add(u.created_at?new Date(u.created_at).toLocaleString():"—");
+const td=document.createElement("td");tr.append(td);const options=tab==="pending"?[["Approve","approved",""],["Reject","rejected","danger"]]:tab==="approved"?[["Revoke access","revoked","danger"]]:[["Move to pending","pending","secondary"]];
+for(const [label,status,style] of options){const b=document.createElement("button");b.type="button";b.className="btn small "+style;b.textContent=label;b.onclick=async()=>{if(status==="approved"&&!confirm("Have you verified this teacher's payment in MTN MoMo?"))return;if(status==="revoked"&&!confirm("Revoke this teacher's access?"))return;b.disabled=true;try{await api("admin_decide",{token_hash:u.token_hash,status});await load(true);notify((u.display_name||"Teacher")+" updated to "+status+". They have moved to the relevant list.")}catch(e){notify("Unable to update subscriber: "+e.message,"error")}finally{b.disabled=false}};td.append(b)}
+tbody.append(tr)}
+}
+async function load(silent=false){const data=await api("admin_summary");all=data.users||[];applyConfig(data.config);render();if(!silent)notify("Latest settings and teacher lists loaded ("+stamp()+").")}
+async function login(){const b=el("signin");b.disabled=true;secret=el("pw").value.trim();el("loginError").hidden=true;try{await load(true);el("login").hidden=true;el("panel").hidden=false;el("pw").value="";notify("Signed in. Current settings loaded from the live database.")}catch(e){secret="";el("loginError").textContent="Sign-in failed: "+e.message;el("loginError").hidden=false}finally{b.disabled=false}}
+el("signin").onclick=login;el("pw").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
+document.querySelectorAll('input[name="mode"]').forEach(r=>r.onchange=()=>{dirty=true;el("saveStatus").textContent="Unsaved changes";el("saveStatus").className="error"});
+el("price").oninput=()=>{dirty=true;el("saveStatus").textContent="Unsaved changes";el("saveStatus").className="error"};
+el("save").onclick=async()=>{if(busy)return;busy=true;const b=el("save");const mode=readMode(),price=Number(el("price").value);b.disabled=true;el("saveStatus").textContent="Saving to server…";el("saveStatus").className="";
+try{const saved=await api("admin_mode",{mode,price});if(!saved.saved)throw Error("Server did not confirm the save");dirty=false;const fresh=await api("admin_summary");applyConfig(fresh.config,true);all=fresh.users||[];render();if(fresh.config.mode!==mode||fresh.config.price!==price)throw Error("Verification mismatch. Reload and retry.");const txt="Saved successfully at "+stamp()+" — "+labels[mode]+" is now active for the public planner.";el("saveStatus").textContent="✓ "+txt;notify(txt)}
+catch(e){dirty=true;el("saveStatus").className="error";el("saveStatus").textContent="Save failed — "+e.message;notify(el("saveStatus").textContent,"error")}
+finally{b.disabled=false;busy=false}};
+el("refreshSettings").onclick=async()=>{try{dirty=false;await load();el("saveStatus").textContent="Live settings reloaded"}catch(e){notify(e.message,"error")}};
+el("refresh").onclick=async()=>{try{await load()}catch(e){notify(e.message,"error")}};
+document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
+el("logout").onclick=()=>{secret="";all=[];el("panel").hidden=true;el("login").hidden=false;el("toast").hidden=true;el("saveStatus").textContent=""};
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&secret&&!busy)load(true).catch(()=>{})});
+setInterval(()=>{if(secret&&!document.hidden&&!busy)load(true).catch(()=>{})},10000);
+})();
 </script></body></html>
