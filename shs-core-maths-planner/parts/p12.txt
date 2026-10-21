@@ -4281,7 +4281,7 @@ function appendVerifiedSTP(doc,settings){
 
   async function copyForWord() {
     const d = current; if (!d) return;
-    const html = `<html><body>${PASTE.planner(d)}<script src="access.js"></script></body></html>`;
+    const html = `<html><body>${PASTE.planner(d)}</body></html>`;
     const text = Smart.plain(d);
     let ok = false;
     try { if (navigator.clipboard && window.ClipboardItem) { await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([text], { type: 'text/plain' }) })]); ok = true; } } catch (e) { }
@@ -4751,4 +4751,4 @@ function appendVerifiedSTP(doc,settings){
   if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});
 })();
 </script>
-</body></html>
+<script src="access.js"></script></body></html>
