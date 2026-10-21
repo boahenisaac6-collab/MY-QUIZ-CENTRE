@@ -5,12 +5,23 @@ const css=document.createElement('style');css.textContent='.gate-overlay{positio
 const overlay=document.createElement('div');overlay.className='gate-overlay';overlay.hidden=true;overlay.innerHTML='<section class="gate-panel" role="dialog" aria-modal="true"><h2 id="gateTitle">Subscription required</h2><p id="gateExplain"></p><p><b>Subscription fee: GH₵<span id="gatePrice">100</span></b></p><p>MTN Mobile Money:</p><p class="mtn" id="gateMtn">0248 481 1762</p><p>Make payment, then request activation. Approval follows manual payment verification by the administrator.</p><label for="gateName">Teacher name</label><input id="gateName" placeholder="Your full name" autocomplete="name"><label for="gatePhone">Contact telephone</label><input id="gatePhone" type="tel" placeholder="024…"><p id="gateStatus" role="status"></p><button id="gateRequest">Request activation</button><button class="alt" id="gateRefresh">Check approval</button><button class="alt" id="gateClose">Close</button><p style="font-size:12px;color:#625764">One approval is linked to the current browser/device. Do not clear browser data before access is activated.</p></section>';document.body.append(overlay);
 const $=s=>document.getElementById(s);
 async function api(action,data={}){const resp=await fetch(API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,token,...data}),cache:'no-store'});let j=await resp.json();if(!resp.ok)throw Error(j.error||'Service unavailable');return j}
-async function refresh(){const x=await api('status');config=x.config;status=x.status;return x}
-function show(kind){$('gateTitle').textContent=kind==='week'?'Unlock more weeks':kind==='locked'?'Activate access':'Unlock Word and PDF downloads';$('gateExplain').textContent=kind==='week'?'Week 1 can be previewed without subscribing. Activate to prepare other weeks.':kind==='locked'?'The administrator has enabled subscription-only access.':'You can prepare and preview lessons. Downloading the plan requires approval.';$('gatePrice').textContent=config?.price??100;$('gateMtn').textContent=(config?.payment_phone||'02484811762').replace(/(\d{4})(\d{3})(\d{4})/,'$1 $2 $3');$('gateStatus').textContent=status==='pending'?'Your request is awaiting payment confirmation.':'';overlay.hidden=false}
+async function refresh(){const x=await api('status');config=x.config;status=x.status;syncPolicy();return x}
+function show(kind){$('gateTitle').textContent=kind==='week'?'Unlock more weeks':kind==='locked'?'Activate access':'Unlock Word and PDF downloads';$('gateExplain').textContent=kind==='week'?'Week 1 can be previewed without subscribing. Activate to prepare other weeks.':kind==='locked'?'The administrator has enabled subscription-only access.':'You can prepare and preview lessons. Downloading the plan requires approval.';$('gatePrice').textContent=config?.price??100;$('gateMtn').textContent=(config?.payment_phone||'02484811762').replace(/(\d{4})(\d{3})(\d{4})/,'$1 $2 $3');$('gateStatus').textContent=status==='pending'?'Your request is awaiting payment confirmation.':'';overlay.hidden=false;$('gateClose').hidden=kind==='locked';}
 async function guard(kind,week){try{await refresh()}catch(e){$('gateStatus').textContent='Internet connection required: '+e.message;show('locked');return false}if(config.mode==='free'||status==='approved')return true;if(kind==='generate'&&(config.mode==='print'||(config.mode==='week1'&&Number(week)===1)))return true;show(kind==='generate'?(config.mode==='week1'?'week':'locked'):'print');return false}
 $('gateRequest').onclick=async()=>{try{const j=await api('request',{name:$('gateName').value,phone:$('gatePhone').value});status=j.status;$('gateStatus').textContent=status==='approved'?'Subscription already approved.':'Request received. Please pay the displayed MTN number and contact the administrator for verification.'}catch(e){$('gateStatus').textContent=e.message}};
 $('gateRefresh').onclick=async()=>{try{await refresh();$('gateStatus').textContent=status==='approved'?'Approved. Close this message and try again.':'Current status: '+status}catch(e){$('gateStatus').textContent=e.message}};
-$('gateClose').onclick=()=>overlay.hidden=true;
-window.CMLP={guardExport:()=>guard('export'),guardGeneration:week=>guard('generate',week),refresh};
+$('gateClose').onclick=()=>{if(config?.mode==='locked'&&status!=='approved')return;overlay.hidden=true;}
+
+function syncPolicy(){
+ if(!config)return;
+ if(config.mode==='free'||status==='approved'){overlay.hidden=true;return;}
+ if(config.mode==='locked'){show('locked');return;}
+ if(!overlay.hidden){if($('gateTitle').textContent==='Activate access')overlay.hidden=true;}
+}
+function heartbeat(){if(!document.hidden)refresh().catch(e=>console.warn('Policy refresh failed',e))}
+setInterval(heartbeat,6000);
+document.addEventListener('visibilitychange',heartbeat);
+window.addEventListener('focus',heartbeat);
+window.CMLP={guardExport:()=>guard('export'),guardGeneration:week=>guard('generate',week),refresh,getState:()=>({config,status})};
 refresh().catch(()=>{});
 })();
