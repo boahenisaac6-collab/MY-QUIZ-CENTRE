@@ -75,8 +75,32 @@ if(wizard){
 }
 let replay=false;
 document.addEventListener("click",async event=>{
+ if(replay)return;
+ const yearButton=event.target?.closest?.('#years button[data-year]');
+ if(yearButton&&config?.mode==="week1"&&status!=="approved"){
+   event.preventDefault();event.stopImmediatePropagation();
+   const back=document.getElementById("guidedEditAnswers");
+   if(back){back.click();banner.hidden=false;banner.textContent="Choose a year, then select a week marked Free. Restricted weeks will ask for subscription approval."}
+   return;
+ }
+ const nav=event.target?.closest?.('button[data-wnav]');
+ if(nav){
+   const selected=document.querySelector('#wgrid .wk[aria-pressed="true"]');
+   const parsed=selected&&weekParts(selected.dataset.week);
+   if(parsed){
+     const next=parsed.week+Number(nav.dataset.wnav);
+     const limit=parsed.year===3?20:24;
+     if(next>=1&&next<=limit){
+       const intended='y'+parsed.year+'w'+String(next).padStart(2,'0');
+       event.preventDefault();event.stopImmediatePropagation();
+       try{await refresh()}catch(e){show("locked");$("gateExplain").textContent="Please reconnect to check the latest subscription settings.";return;}
+       if(!canPlan(intended)){show("week",intended);return;}
+       replay=true;try{nav.click()}finally{replay=false;}return;
+     }
+   }
+ }
  const button=event.target?.closest?.("button[data-gweek],button[data-week]");
- if(!button||replay)return;
+ if(!button)return;
  const id=button.dataset.gweek||button.dataset.week;
  if(!weekParts(id))return;
  // Check on click, not merely at lesson generation. Never select a restricted week first.
