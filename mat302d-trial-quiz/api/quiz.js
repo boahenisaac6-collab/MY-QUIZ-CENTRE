@@ -32,7 +32,9 @@ module.exports=async function handler(req,res){
     if(upstream.headers.get('location'))res.setHeader('Location',upstream.headers.get('location'));
     res.setHeader('Content-Type',upstream.headers.get('content-type')||'text/html; charset=utf-8');
     const payload=Buffer.from(await upstream.arrayBuffer());
-    return res.status(upstream.status).send(payload);
+    res.statusCode=upstream.status;
+    // Do not use res.send(Buffer): it overrides text/html with text/plain in Vercel.
+    return res.end(payload);
   }catch(err){
     console.error('Quiz portal proxy: '+String(err));
     return res.status(503).send('Temporary connection issue. Please refresh the page.');
