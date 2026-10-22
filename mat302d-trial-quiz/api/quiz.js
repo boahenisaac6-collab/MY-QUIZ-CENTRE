@@ -1,6 +1,6 @@
 // Shared course-selector and access-control gateway.
 // Sensitive passwords, session tokens and BIO202D source remain on the private backend.
-const ENDPOINT='https://dhnrrruishllmnhafjdd.supabase.co/functions/v1/quiz-multi-portal';
+const ENDPOINT='https://dhnrrruishllmnhafjdd.supabase.co/functions/v1/quiz-portal-v2';
 module.exports=async function handler(req,res){
   res.setHeader('Cache-Control','private, no-store, max-age=0');
   res.setHeader('X-Content-Type-Options','nosniff');
@@ -32,7 +32,7 @@ module.exports=async function handler(req,res){
     if(upstream.headers.get('location'))res.setHeader('Location',upstream.headers.get('location'));
     // The shared backend is returned as text/plain by its edge intermediary.
     // These are HTML pages except for the explicitly defined status/permit JSON endpoints.
-    const isJson = ['status','permit'].includes(original.searchParams.get('action'));
+    const isJson = ['status','public','permit'].includes(original.searchParams.get('action'));
     res.setHeader('Content-Type',isJson?'application/json; charset=utf-8':'text/html; charset=utf-8');
     const payload=Buffer.from(await upstream.arrayBuffer());
     res.statusCode=upstream.status;
