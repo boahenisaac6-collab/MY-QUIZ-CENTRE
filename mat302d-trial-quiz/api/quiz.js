@@ -30,7 +30,10 @@ module.exports=async function handler(req,res){
         (upstream.headers.get('set-cookie')?[upstream.headers.get('set-cookie')]:[]);
     if(setCookies.length)res.setHeader('Set-Cookie',setCookies);
     if(upstream.headers.get('location'))res.setHeader('Location',upstream.headers.get('location'));
-    res.setHeader('Content-Type',upstream.headers.get('content-type')||'text/html; charset=utf-8');
+    // The shared backend is returned as text/plain by its edge intermediary.
+    // These are HTML pages except for the explicitly defined status/permit JSON endpoints.
+    const isJson = ['status','permit'].includes(original.searchParams.get('action'));
+    res.setHeader('Content-Type',isJson?'application/json; charset=utf-8':'text/html; charset=utf-8');
     const payload=Buffer.from(await upstream.arrayBuffer());
     res.statusCode=upstream.status;
     // Do not use res.send(Buffer): it overrides text/html with text/plain in Vercel.
