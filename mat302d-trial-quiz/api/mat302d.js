@@ -86,7 +86,7 @@ module.exports = async function handler(req,res) {
     const a=u.searchParams.get('action')||'';
     const administrator=u.searchParams.has('admin')||u.searchParams.get('as_admin')==='1'||['admin-login','save','logout'].includes(a);
     if(!administrator){
-      const gate=await fetch('https://dhnrrruishllmnhafjdd.supabase.co/functions/v1/quiz-multi-portal?action=permit&course=mat302d',{headers:{cookie:req.headers.cookie||'',accept:'application/json'},cache:'no-store',signal:AbortSignal.timeout(10000)});
+      const gate=await fetch('https://dhnrrruishllmnhafjdd.supabase.co/functions/v1/quiz-portal-v2?action=permit&course=mat302d',{headers:{cookie:req.headers.cookie||'',accept:'application/json'},cache:'no-store',signal:AbortSignal.timeout(10000)});
       if(!gate.ok)throw Error('Subscription status unavailable');
       const state=await gate.json();
       if(!state.enabled){res.statusCode=302;res.setHeader('Location','/api/quiz');return res.end();}
