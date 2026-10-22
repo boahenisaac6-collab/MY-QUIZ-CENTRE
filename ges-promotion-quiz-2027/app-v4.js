@@ -61,14 +61,23 @@ function renderDashboard(){
  $('openExtraBank')?.addEventListener('click',openExtraBank);
  $('logoutBtn').onclick=logout;$('startPractice').onclick=startPractice;$('performanceBtn').onclick=showPerformance;$('subscribeBtn')?.addEventListener('click',requestSubscription);$('copyMomo')?.addEventListener('click',copyMomo);
 }
-function openExtraBank(){
+async function openExtraBank(){
  if(state.user?.status!=='approved'){toast('Subscriber approval required.',true);return;}
  if(document.getElementById('extraBankOverlay'))return;
  const host=document.createElement('div');host.id='extraBankOverlay';
  host.style.cssText='position:fixed;inset:0;z-index:99999;background:#f1f7f3;display:flex;flex-direction:column';
- host.innerHTML='<div style="height:auto;min-height:54px;padding:8px 12px;padding-top:max(8px,env(safe-area-inset-top));display:flex;align-items:center;gap:12px;background:#034d2f;color:white"><button id="closeExtraBank" type="button" style="padding:10px 13px;background:white;color:#034d2f;border:0;border-radius:10px;font-weight:800">← Back</button><strong style="font-size:14px">GES Promotion · 984 Questions</strong></div><iframe title="Additional GES Promotion Quiz" style="width:100%;flex:1;min-height:0;border:0;background:#fff" src="./additional-984-questions.html"></iframe>';
+ host.innerHTML='<div style="min-height:54px;padding:8px 12px;padding-top:max(8px,env(safe-area-inset-top));display:flex;align-items:center;gap:12px;background:#034d2f;color:white"><button id="closeExtraBank" type="button" style="padding:10px 13px;background:white;color:#034d2f;border:0;border-radius:10px;font-weight:800">← Back</button><strong style="font-size:14px">GES Promotion · 984 Questions</strong></div><div id="extraBankContent" style="flex:1;display:grid;place-items:center;padding:18px">Verifying your approved subscription…</div>';
  document.body.appendChild(host);
  host.querySelector('#closeExtraBank').onclick=()=>host.remove();
+ try{
+  const response=await fetch('https://dhnrrruishllmnhafjdd.supabase.co/functions/v1/ges-promotion-bank-addon',{method:'GET',headers:{Authorization:'Bearer '+state.token},cache:'no-store'});
+  if(!response.ok)throw new Error(response.status===401?'Please sign in again.':response.status===403?'Approved subscription required.':'Unable to load the question bank.');
+  const html=await response.text();
+  if(!html.includes('id="bank"')||!html.includes('id="startBtn"'))throw new Error('Question bank verification failed.');
+  if(!host.isConnected)return;
+  const frame=document.createElement('iframe');frame.title='GES Promotion Question Bank — 984 Questions';frame.setAttribute('allow','autoplay');frame.style.cssText='width:100%;flex:1;min-height:0;border:0;background:#fff';frame.srcdoc=html;
+  host.querySelector('#extraBankContent').replaceWith(frame);
+ }catch(e){if(host.isConnected)host.querySelector('#extraBankContent').textContent=e.message||'Unable to verify your subscription.';}
 }
 async function copyMomo(){try{await navigator.clipboard.writeText('0248481762');toast('MoMo number copied')}catch{toast('MoMo: 0248 481 762')}}
 async function requestSubscription(){if(state.user?.status==='approved')return;try{const d=await api('request_subscription');state.user.status=d.status||'pending';toast('Activation request sent');renderDashboard()}catch(e){toast(e.message,true)}}
