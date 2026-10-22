@@ -3,6 +3,9 @@
   "functions": {
     "api/quiz.js": {
       "maxDuration": 30
+    },
+    "api/mat302d.js": {
+      "maxDuration": 30
     }
   },
   "headers": [
