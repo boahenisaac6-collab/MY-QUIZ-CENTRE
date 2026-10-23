@@ -22,6 +22,15 @@
 @media (max-width:380px){.new-bank-hero{padding:23px 11px 18px}.new-bank-stats span{font-size:9px}.new-bank-symbol span{margin:0 3px;font-size:9px}}
 @media (prefers-reduced-motion:no-preference){.new-bank-dot{animation:new-bank-pulse 2.5s ease-in-out infinite}@keyframes new-bank-pulse{50%{box-shadow:0 0 0 8px rgba(252,209,22,.08)}}}
 </style>
+<style>
+.preview-ten{margin:20px auto 18px;max-width:760px;background:#fff;border:1px solid #d3e3da;border-radius:20px;overflow:hidden;box-shadow:0 14px 34px rgba(4,64,38,.1)}
+.preview-head{padding:21px 17px 17px;background:linear-gradient(135deg,#06462d,#087747);color:#fff;text-align:center;border-top:5px solid #fcd116}.preview-free{display:inline-block;color:#15301f;background:#fcd116;padding:5px 11px;font-size:11px;font-weight:900;letter-spacing:.04em;border-radius:20px;animation:preview-glow 2.2s infinite}
+.preview-head h2{font-size:clamp(20px,5vw,28px);margin:12px 0 8px;color:#fff}.preview-head p{font-size:14px;line-height:1.5;margin:0 auto 15px;max-width:510px;color:#e5f4e9}
+.preview-meter{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:800}.preview-track{height:6px;border-radius:8px;background:#4c9472;margin-top:8px;overflow:hidden}.preview-track span{display:block;height:100%;width:10%;background:#fcd116;transition:width .25s}
+.preview-content{padding:19px 16px 14px}.preview-topic{display:inline-block;font-size:11px;color:#006b3f;background:#e5f4ea;border-radius:7px;font-weight:800;padding:5px 9px;margin-bottom:11px}.preview-question{margin:0 0 15px;font-size:19px;line-height:1.42;color:#163423;font-weight:750}.preview-options{display:grid;gap:9px}.preview-option{width:100%;display:flex;gap:12px;align-items:flex-start;padding:13px;text-align:left;background:#fff;border:1.5px solid #d5e4da;border-radius:12px;color:#183d29;font-size:15px;cursor:pointer;white-space:normal;line-height:1.4}.preview-option span:first-child{flex:none;width:27px;height:27px;display:grid;place-items:center;border-radius:50%;border:1px solid #88a898;font-weight:800;font-size:12px}.preview-option.preview-correct{border-color:#087a49;background:#e6f7ec}.preview-option.preview-wrong{border-color:#c32938;background:#fff0f0}.preview-option:disabled{cursor:default;opacity:1}.preview-explain{margin-top:12px;padding:12px;border-left:4px solid #006b3f;background:#edf8f0;border-radius:8px;color:#193d29;font-size:14px;line-height:1.55}
+.preview-actions{display:flex;gap:10px;padding:0 16px 16px}.preview-actions button{flex:1;min-width:0;border-radius:10px;padding:13px 9px;font-size:13px;font-weight:800;cursor:pointer;white-space:normal}.preview-primary{border:0;background:#006b3f;color:white}.preview-outline{border:1px solid #006b3f;background:white;color:#006b3f}.preview-actions button:disabled{opacity:.45;cursor:default}.preview-footer{font-size:12px;text-align:center;color:#5b7164;padding:0 16px 17px;margin:0}
+@keyframes preview-glow{50%{box-shadow:0 0 0 5px rgba(252,209,22,.18)}}@media(prefers-reduced-motion:reduce){.preview-free{animation:none}}
+</style>
 </head>
 <body>
 <header class="top-brand"><div class="flagline"></div><div class="brand"><h1>Promotion Exam Preparation Practice</h1><p>Independent practice platform for Ghana Education Service promotion-exam preparation</p></div></header>
@@ -30,8 +39,8 @@
 <div class="new-bank-tag"><span class="new-bank-dot"></span> NEW QUESTION BANK UPDATE <span class="new-bank-spark">★</span></div>
 <div class="new-bank-symbol">★ <span>GES PROMOTION EXAM PRACTICE</span> ★</div>
 <h2>More Questions.<br><span>Stronger Preparation.</span></h2>
-<p>Our practice platform has expanded! An additional <strong>984 GES promotion practice questions</strong> are now available to approved subscribers across all six promotion ranks.</p>
-<div class="new-bank-stats"><span><strong>984</strong> Additional Questions</span><span><strong>6</strong> Promotion Ranks</span><span><strong>1</strong> Existing Subscription</span></div>
+<p>Our practice platform has expanded! An additional <strong>1,128 GES promotion practice questions</strong> are now available to approved subscribers across all six promotion ranks.</p>
+<div class="new-bank-stats"><span><strong>1,128</strong> Questions</span><span><strong>6</strong> Promotion Ranks</span><span><strong>1</strong> Existing Subscription</span></div>
 <div class="new-bank-encourage">Learn consistently • Build confidence • Prepare for success</div>
 </section>
 <div class="hero"><h2 id="authTitle">Choose how to continue</h2><p id="authSubtitle">New users register here. Existing members log in with their registered telephone number and PIN to continue practising.</p></div>
@@ -40,6 +49,7 @@
 <button type="button" id="newUserCard" class="auth-choice new-card"><span class="icon">👤➕</span><h3>New User — Register First</h3><p>Create your account once using your full name, telephone number and a 4-digit login password.</p><b>Register First →</b><span class="tap-note">Tap this card to open registration</span></button>
 <button type="button" id="existingUserCard" class="auth-choice login-card"><span class="icon">🔐</span><h3>Already Have an Account?</h3><p>Enter the telephone number and 4-digit password you used when registering, then open your quiz dashboard.</p><b>Log In →</b><span class="tap-note">Tap this blinking card to log in</span></button>
 </section>
+<section id="previewTen" class="preview-ten" aria-labelledby="previewTenTitle"><div class="preview-head"><span class="preview-free">★ FREE · NO LOGIN NEEDED</span><h2 id="previewTenTitle">Try 10 Real Promotion Questions</h2><p>Experience the question bank before registering. Choose an answer, see the correct option and explanation, and practise again as often as you like.</p><div class="preview-meter"><span id="previewProgress">Question 1 of 10</span><span id="previewScore">0 correct</span></div><div class="preview-track"><span id="previewFill"></span></div></div><div id="previewContent" class="preview-content"><p>Loading your free practice…</p></div><div class="preview-actions"><button type="button" id="previewPrevious" class="preview-outline">← Previous</button><button type="button" id="previewNext" class="preview-primary">Next question →</button></div><p class="preview-footer">Enjoyed this practice? Register or log in above for the full subscriber question bank.</p></section>
 <div class="security-note"><strong>Free practice:</strong> after registration or login, you can start the 30-question free practice. After completing it, you may repeat the free practice or activate full access.</div>
 <section id="registerPanel" class="panel hidden"><div class="panel-head"><button type="button" class="back" data-back-auth>←</button><div><h3>Register New Account</h3><small>First-time users only</small></div></div><form id="registerForm"><label>Full name</label><input id="regName" autocomplete="name" required placeholder="Enter your full name"><label>Telephone number</label><input id="regPhone" inputmode="tel" autocomplete="tel" required placeholder="e.g. 0240000000"><label>Create 4-digit login password</label><input id="regPin" type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" required placeholder="Create 4 digits"><button id="registerBtn" type="submit" class="primary block pulse-soft">Register & Continue</button><div class="hint">Once registration succeeds, your practice dashboard opens immediately and you can start the free 30 questions.</div></form></section>
 <section id="loginPanel" class="panel hidden"><div class="panel-head"><button type="button" class="back" data-back-auth>←</button><div><h3>Log In to Your Account</h3><small>For users who have already registered</small></div></div><form id="loginForm"><label>Registered telephone number</label><input id="loginPhone" inputmode="tel" autocomplete="tel" required placeholder="Enter your registered telephone number"><label>4-digit login password</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" pattern="\d{4}" autocomplete="current-password" required placeholder="Enter your 4 digits"><button id="loginBtn" type="submit" class="primary block pulse-soft">Log In & Open Quiz</button><div class="hint">Use exactly the same telephone number and 4-digit password you created during registration. Successful login takes you directly to your practice dashboard.</div></form></section>
@@ -55,5 +65,37 @@
 <script src="./full-bank-part3.js?v=20261002e"></script>
 <script src="./full-bank-part4.js?v=20261002e"></script>
 <script src="./app-v4.js?v=20261022-answerfix3"></script>
+<script>
+(function(){
+'use strict';
+var qs=[{"q":"How is the work of the Ministry of Education (MoE) related to that of the Ghana Education Service (GES)?","o":["MoE gives policy direction while GES implements the policies","Both bodies perform exactly the same functions","GES formulates policies while MoE runs the schools","MoE implements policies that GES formulates"],"a":0,"e":"The MoE is the policy-making ministry; GES is the implementing agency for approved pre-tertiary policies and programmes.","t":"MoE, GES & Education Law","id":1},{"q":"The Ghana Education Service Act, 1995 (Act 506) set up GES mainly to","o":["manage and decentralise the delivery of pre-tertiary education services","take over the administration of universities","privatise public schools","replace the Ministry of Education"],"a":0,"e":"Act 506 gave GES the mandate to implement and manage pre-tertiary education delivery through national, regional and district structures.","t":"MoE, GES & Education Law","id":2},{"q":"Which function belongs to the Ministry of Education rather than to GES?","o":["Posting head teachers to schools","Developing national education policies","Recruiting teachers into the Service","Supervising basic schools"],"a":1,"e":"Policy formulation is the Ministry's role; posting, recruitment and supervision are implementation duties of GES.","t":"MoE, GES & Education Law","id":3},{"q":"Which scenario shows GES applying a policy made by the Ministry of Education?","o":["GES designs Free SHS and funds it","GES abolishes school fees on its own authority","GES prepares the national education budget","GES ensures schools carry out the Free SHS policy at school level"],"a":3,"e":"Free SHS is a government/MoE policy; GES's role is to see that it is implemented in schools.","t":"MoE, GES & Education Law","id":4},{"q":"The core mandate of the Ghana Education Service is to","o":["develop the national curriculum for the Ministry","formulate national policies on education","prepare the teachers' salary structure","implement approved national pre-tertiary education policies and programmes"],"a":3,"e":"GES is the implementing agency; policy formulation belongs to MoE and curriculum development to NaCCA.","t":"MoE, GES & Education Law","id":5},{"q":"The governing body of the Ghana Education Service is the","o":["Regional Director of Education","GES Headquarters","Director-General of GES","GES Council"],"a":3,"e":"The Council is the governing body; the Director-General is the chief executive answerable to it.","t":"MoE, GES & Education Law","id":6},{"q":"On the GES organogram, the Director-General is directly answerable to the","o":["Public Services Commission","GES Council","Chief Director of MoE","Minister of Education"],"a":1,"e":"The Director-General heads the Service and reports to the governing Council.","t":"MoE, GES & Education Law","id":7},{"q":"Which of these is NOT a specific duty of the Ghana Education Service?","o":["Implementing approved pre-tertiary programmes","Maintaining professional standards and conduct of its personnel","Formulating national educational policies","Keeping an up-to-date register of teachers in the public system"],"a":2,"e":"Policy formulation is the role of the Ministry of Education, not GES.","t":"MoE, GES & Education Law","id":8},{"q":"The Ghana Education Service was first established in","o":["1987","1957","1974","1995"],"a":2,"e":"GES was created in 1974 as part of the Public Service; Act 506 of 1995 later restated its legal framework.","t":"MoE, GES & Education Law","id":9},{"q":"The Act that set up the Ghana Education Service in 1995 is","o":["Act 1023","Act 778","Act 605","Act 506"],"a":3,"e":"The Ghana Education Service Act, 1995 is Act 506.","t":"MoE, GES & Education Law","id":10}];
+var choices=new Array(qs.length).fill(null),idx=0;
+var get=function(id){return document.getElementById(id);};
+function render(){
+var q=qs[idx],answered=choices[idx]!==null,correct=choices.filter(function(v,i){return v===qs[i].a;}).length;
+get('previewProgress').textContent='Question '+(idx+1)+' of '+qs.length;
+get('previewScore').textContent=correct+' correct';
+get('previewFill').style.width=((idx+1)/qs.length*100)+'%';
+var host=get('previewContent');host.replaceChildren();
+var topic=document.createElement('span');topic.className='preview-topic';topic.textContent=q.t;host.appendChild(topic);
+var title=document.createElement('h3');title.className='preview-question';title.textContent=q.q;host.appendChild(title);
+var wrap=document.createElement('div');wrap.className='preview-options';
+q.o.forEach(function(option,i){
+var btn=document.createElement('button');btn.type='button';btn.className='preview-option';btn.disabled=answered;
+if(answered&&i===q.a)btn.className+=' preview-correct';
+else if(answered&&i===choices[idx])btn.className+=' preview-wrong';
+var l=document.createElement('span');l.textContent=String.fromCharCode(65+i);
+var t=document.createElement('span');t.textContent=option;btn.append(l,t);
+btn.addEventListener('click',function(){if(choices[idx]!==null)return;choices[idx]=i;render();});wrap.appendChild(btn);
+});host.appendChild(wrap);
+if(answered){var explain=document.createElement('div');explain.className='preview-explain';explain.textContent=(choices[idx]===q.a?'✓ Correct. ':'Correct answer: '+q.o[q.a]+'. ')+(q.e||'');host.appendChild(explain);}
+get('previewPrevious').disabled=idx===0;
+get('previewNext').textContent=idx===qs.length-1?'↻ Practise again':'Next question →';
+}
+get('previewPrevious').addEventListener('click',function(){if(idx>0){idx--;render();}});
+get('previewNext').addEventListener('click',function(){if(idx===qs.length-1){idx=0;choices.fill(null);}else idx++;render();});
+render();
+})();
+</script>
 </body>
 </html>
