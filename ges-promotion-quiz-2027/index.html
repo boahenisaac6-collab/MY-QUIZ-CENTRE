@@ -92,7 +92,7 @@ if(answered&&i===q.a)btn.className+=' preview-correct';
 else if(answered&&i===choices[idx])btn.className+=' preview-wrong';
 var l=document.createElement('span');l.textContent=String.fromCharCode(65+i);
 var t=document.createElement('span');t.textContent=option;btn.append(l,t);
-btn.addEventListener('click',function(){if(choices[idx]!==null)return;choices[idx]=i;render();});wrap.appendChild(btn);
+btn.addEventListener('click',function(){if(choices[idx]!==null)return;choices[idx]=i;render();if(choices.every(function(v){return v!==null;}))openFinish();});wrap.appendChild(btn);
 });host.appendChild(wrap);
 if(answered){var explain=document.createElement('div');explain.className='preview-explain';explain.textContent=(choices[idx]===q.a?'✓ Correct. ':'Correct answer: '+q.o[q.a]+'. ')+(q.e||'');host.appendChild(explain);}
 get('previewPrevious').disabled=idx===0;
@@ -113,7 +113,7 @@ get('jumpPreview').addEventListener('click',function(){get('previewTen').scrollI
 get('jumpRegister').addEventListener('click',function(){toAuth('register');});
 get('jumpLogin').addEventListener('click',function(){toAuth('login');});
 get('previewPrevious').addEventListener('click',function(){if(idx>0){idx--;render();}});
-get('previewNext').addEventListener('click',function(){if(idx===qs.length-1){openFinish();return;}idx++;render();});
+get('previewNext').addEventListener('click',function(){if(idx===qs.length-1){if(choices.every(function(v){return v!==null;})){openFinish();}else{var first=choices.indexOf(null);idx=first<0?0:first;render();get('previewTen').scrollIntoView({behavior:'smooth',block:'start'});}return;}idx++;render();});
 render();
 })();
 </script>
