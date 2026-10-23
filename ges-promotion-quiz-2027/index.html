@@ -64,7 +64,14 @@
 (function(){
 'use strict';
 var qs=[{"q":"How is the work of the Ministry of Education (MoE) related to that of the Ghana Education Service (GES)?","o":["MoE gives policy direction while GES implements the policies","Both bodies perform exactly the same functions","GES formulates policies while MoE runs the schools","MoE implements policies that GES formulates"],"a":0,"e":"The MoE is the policy-making ministry; GES is the implementing agency for approved pre-tertiary policies and programmes.","t":"MoE, GES & Education Law","id":1},{"q":"The Ghana Education Service Act, 1995 (Act 506) set up GES mainly to","o":["manage and decentralise the delivery of pre-tertiary education services","take over the administration of universities","privatise public schools","replace the Ministry of Education"],"a":0,"e":"Act 506 gave GES the mandate to implement and manage pre-tertiary education delivery through national, regional and district structures.","t":"MoE, GES & Education Law","id":2},{"q":"Which function belongs to the Ministry of Education rather than to GES?","o":["Posting head teachers to schools","Developing national education policies","Recruiting teachers into the Service","Supervising basic schools"],"a":1,"e":"Policy formulation is the Ministry's role; posting, recruitment and supervision are implementation duties of GES.","t":"MoE, GES & Education Law","id":3},{"q":"Which scenario shows GES applying a policy made by the Ministry of Education?","o":["GES designs Free SHS and funds it","GES abolishes school fees on its own authority","GES prepares the national education budget","GES ensures schools carry out the Free SHS policy at school level"],"a":3,"e":"Free SHS is a government/MoE policy; GES's role is to see that it is implemented in schools.","t":"MoE, GES & Education Law","id":4},{"q":"The core mandate of the Ghana Education Service is to","o":["develop the national curriculum for the Ministry","formulate national policies on education","prepare the teachers' salary structure","implement approved national pre-tertiary education policies and programmes"],"a":3,"e":"GES is the implementing agency; policy formulation belongs to MoE and curriculum development to NaCCA.","t":"MoE, GES & Education Law","id":5},{"q":"The governing body of the Ghana Education Service is the","o":["Regional Director of Education","GES Headquarters","Director-General of GES","GES Council"],"a":3,"e":"The Council is the governing body; the Director-General is the chief executive answerable to it.","t":"MoE, GES & Education Law","id":6},{"q":"On the GES organogram, the Director-General is directly answerable to the","o":["Public Services Commission","GES Council","Chief Director of MoE","Minister of Education"],"a":1,"e":"The Director-General heads the Service and reports to the governing Council.","t":"MoE, GES & Education Law","id":7},{"q":"Which of these is NOT a specific duty of the Ghana Education Service?","o":["Implementing approved pre-tertiary programmes","Maintaining professional standards and conduct of its personnel","Formulating national educational policies","Keeping an up-to-date register of teachers in the public system"],"a":2,"e":"Policy formulation is the role of the Ministry of Education, not GES.","t":"MoE, GES & Education Law","id":8},{"q":"The Ghana Education Service was first established in","o":["1987","1957","1974","1995"],"a":2,"e":"GES was created in 1974 as part of the Public Service; Act 506 of 1995 later restated its legal framework.","t":"MoE, GES & Education Law","id":9},{"q":"The Act that set up the Ghana Education Service in 1995 is","o":["Act 1023","Act 778","Act 605","Act 506"],"a":3,"e":"The Ghana Education Service Act, 1995 is Act 506.","t":"MoE, GES & Education Law","id":10}];
-var choices=new Array(qs.length).fill(null),idx=0;
+var TRIAL_KEY='ges-free-trial-ten-one-attempt-v2';
+var saved=null;try{saved=JSON.parse(localStorage.getItem(TRIAL_KEY)||'null');}catch(e){}
+var choices=saved&&Array.isArray(saved.answers)&&saved.answers.length===qs.length?saved.answers:new Array(qs.length).fill(null);
+var idx=saved&&Number.isInteger(saved.index)?Math.max(0,Math.min(qs.length-1,saved.index)):0;
+var completed=!!(saved&&saved.completed);
+function persist(done){try{localStorage.setItem(TRIAL_KEY,JSON.stringify({answers:choices,index:idx,completed:!!done}));}catch(e){}}
+function lockFree(){completed=true;persist(true);get('previewTen').hidden=true;get('jumpPreview').textContent='TRIAL COMPLETED — REGISTER FOR FULL ACCESS →';get('jumpPreview').classList.add('done');get('trialStatus').textContent='Your one-time free trial has ended. Register to request full access.';}
+
 var get=function(id){return document.getElementById(id);};
 function render(){
 var q=qs[idx],answered=choices[idx]!==null,correct=choices.filter(function(v,i){return v===qs[i].a;}).length;
@@ -81,11 +88,11 @@ if(answered&&i===q.a)btn.className+=' preview-correct';
 else if(answered&&i===choices[idx])btn.className+=' preview-wrong';
 var l=document.createElement('span');l.textContent=String.fromCharCode(65+i);
 var t=document.createElement('span');t.textContent=option;btn.append(l,t);
-btn.addEventListener('click',function(){if(choices[idx]!==null)return;choices[idx]=i;render();if(choices.every(function(v){return v!==null;}))openFinish();});wrap.appendChild(btn);
+btn.addEventListener('click',function(){if(choices[idx]!==null)return;choices[idx]=i;persist(false);render();if(choices.every(function(v){return v!==null;})){lockFree();openFinish();}});wrap.appendChild(btn);
 });host.appendChild(wrap);
 if(answered){var explain=document.createElement('div');explain.className='preview-explain';explain.textContent=(choices[idx]===q.a?'✓ Correct. ':'Correct answer: '+q.o[q.a]+'. ')+(q.e||'');host.appendChild(explain);}
 get('previewPrevious').disabled=idx===0;
-get('previewNext').textContent=idx===qs.length-1?'See My Result & Full Access →':'Next question →';
+get('previewNext').textContent=idx===qs.length-1?'Finish & See Full Access →':'Next question →';
 }
 function openFinish(){
 get('previewFinishScore').textContent='Your result: '+choices.filter(function(v,i){return v===qs[i].a;}).length+' out of 10 correct.';
@@ -96,14 +103,12 @@ function restartPreview(){choices.fill(null);idx=0;closeFinish();render();get('p
 function toAuth(mode){closeFinish();var card=get(mode==='register'?'newUserCard':'existingUserCard');if(card)card.click();get('authScreen').scrollIntoView({behavior:'smooth',block:'start'});}
 get('previewJoin').addEventListener('click',function(){toAuth('register');});
 get('previewExisting').addEventListener('click',function(){toAuth('login');});
-get('previewRepeat').addEventListener('click',restartPreview);
+get('previewRepeat').addEventListener('click',function(){toAuth('register');});
 get('previewDismiss').addEventListener('click',closeFinish);
-get('jumpPreview').addEventListener('click',function(){get('previewTen').scrollIntoView({behavior:'smooth',block:'start'});});
-get('jumpRegister').addEventListener('click',function(){toAuth('register');});
-get('jumpLogin').addEventListener('click',function(){toAuth('login');});
-get('previewPrevious').addEventListener('click',function(){if(idx>0){idx--;render();}});
-get('previewNext').addEventListener('click',function(){if(idx===qs.length-1){if(choices.every(function(v){return v!==null;})){openFinish();}else{var first=choices.indexOf(null);idx=first<0?0:first;render();get('previewTen').scrollIntoView({behavior:'smooth',block:'start'});}return;}idx++;render();});
-render();
+get('jumpPreview').addEventListener('click',function(){if(completed){toAuth('register');return;}get('previewTen').hidden=false;persist(false);render();get('previewTen').scrollIntoView({behavior:'smooth',block:'start'});});
+get('previewPrevious').addEventListener('click',function(){if(idx>0){idx--;persist(false);render();}});
+get('previewNext').addEventListener('click',function(){if(idx===qs.length-1){if(choices.every(function(v){return v!==null;})){lockFree();openFinish();}else{var first=choices.indexOf(null);idx=first<0?0:first;persist(false);render();}return;}idx++;persist(false);render();});
+if(completed||choices.every(function(v){return v!==null;})){lockFree();}else{render();}
 })();
 </script>
 </body>
