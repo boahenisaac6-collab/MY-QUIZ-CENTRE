@@ -6,6 +6,14 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 let token='',users=[],stats={},settings={},tab='pending',search='',busy=false;
 const toast=(msg,bad=false)=>{const t=$('toastRoot');t.innerHTML='<div class="toast '+(bad?'bad':'')+'">'+esc(msg)+'</div>';setTimeout(()=>{t.innerHTML=''},4800)};
 async function api(action,body={}){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify({action,...body})});const d=await r.json();if(!r.ok)throw Error(d.error||'Request failed');return d;}
+async function decryptLegacyAdminKey(pass){
+ const blob=window.GES_ADMIN_BLOB;if(!blob||!crypto?.subtle)return null;
+ const bytes=v=>Uint8Array.from(atob(v),ch=>ch.charCodeAt(0));
+ const keyMaterial=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+ const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:bytes(blob.salt),iterations:blob.iterations,hash:'SHA-256'},keyMaterial,{name:'AES-GCM',length:256},false,['decrypt']);
+ const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(blob.iv),additionalData:new TextEncoder().encode(blob.aad)},key,bytes(blob.data));
+ return new TextDecoder().decode(plain).trim();
+}
 function showLogin(){token='';$('adminLogin').classList.remove('hidden');$('adminDashboard').classList.add('hidden')}
 async function refresh(){const d=await api('admin_dashboard');users=d.users||[];stats=d.stats||{};settings=d.settings||{};render();}
 function activeUsers(){const set=tab==='approved'?['approved']:tab==='pending'?['pending']:tab==='free'?['free']:tab==='suspended'?['suspended']:[];return users.filter(u=>(!set.length||set.includes(u.status))&&((u.fullName||'')+' '+(u.phone||'')).toLowerCase().includes(search.toLowerCase()));}
@@ -39,6 +47,6 @@ try{await api(action,body);toast(act==='reset'?'PIN updated. The learner can now
 }
 $('adminLoginForm').addEventListener('submit',async e=>{
 e.preventDefault();const pw=$('adminPassword').value;const alert=$('adminLoginAlert');alert.textContent='Checking administrator access…';
-try{const d=await api('admin_login',{adminKey:pw});token=d.token;alert.textContent='';$('adminPassword').value='';await refresh();}catch(err){token='';alert.textContent=err.message||'Unable to sign in.';}
+try{let d;try{d=await api('admin_login',{adminKey:pw})}catch(first){let alt=null;try{alt=await decryptLegacyAdminKey(pw)}catch{}if(!alt)throw first;d=await api('admin_login',{adminKey:alt})}token=d.token;alert.textContent='';$('adminPassword').value='';await refresh();}catch(err){token='';alert.textContent=err.message||'Unable to sign in.';}
 });
 })();
