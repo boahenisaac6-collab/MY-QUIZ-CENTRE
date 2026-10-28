@@ -14,8 +14,31 @@ async function decryptLegacyAdminKey(pass){
  const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(blob.iv),additionalData:new TextEncoder().encode(blob.aad)},key,bytes(blob.data));
  return new TextDecoder().decode(plain).trim();
 }
+let adminPolling=false,adminSnapshot='';
+async function liveAdminSync(){
+ if(!token||adminPolling||document.hidden||busy)return;
+ adminPolling=true;
+ try{
+  const d=await api('admin_dashboard');
+  const next=d.users||[];
+  const signature=JSON.stringify(next.map(u=>[u.id,u.status,u.phone,u.fullName,u.attemptCount]));
+  if(signature!==adminSnapshot){
+   const oldPending=users.filter(u=>u.status==='pending').length;
+   const initialized=!!adminSnapshot;
+   users=next;stats=d.stats||{};settings=d.settings||{};adminSnapshot=signature;
+   if(initialized&&stats.pending>oldPending)toast('New pending subscriber request received!');
+   if($('adminDashboard')&&!$('adminDashboard').classList.contains('hidden')){
+    if(document.activeElement===$('adminSearch')){renderList();document.querySelectorAll('[data-tab]').forEach(b=>{const label=b.querySelector('b');if(!label)return;const n={pending:stats.pending,approved:stats.approved,free:stats.free,all:stats.total};if(n[b.dataset.tab]!==undefined)label.textContent=n[b.dataset.tab]});}
+    else render();
+   }
+  }
+ }catch(e){console.warn('Live admin sync temporarily unavailable');}
+ finally{adminPolling=false;}
+}
+setInterval(liveAdminSync,1200);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)liveAdminSync()});
 function showLogin(){token='';$('adminLogin').classList.remove('hidden');$('adminDashboard').classList.add('hidden')}
-async function refresh(){const d=await api('admin_dashboard');users=d.users||[];stats=d.stats||{};settings=d.settings||{};render();}
+async function refresh(){const d=await api('admin_dashboard');users=d.users||[];stats=d.stats||{};settings=d.settings||{};adminSnapshot=JSON.stringify(users.map(u=>[u.id,u.status,u.phone,u.fullName,u.attemptCount]));render();}
 function activeUsers(){const set=tab==='approved'?['approved']:tab==='pending'?['pending']:tab==='free'?['free']:tab==='suspended'?['suspended']:[];return users.filter(u=>(!set.length||set.includes(u.status))&&((u.fullName||'')+' '+(u.phone||'')).toLowerCase().includes(search.toLowerCase()));}
 function renderList(){const list=$('adminLearners');if(!list)return;const us=activeUsers();$('adminCount').textContent=us.length+' learner'+(us.length===1?'':'s');list.innerHTML=us.length?us.map(u=>'<div class="manager-learner"><div class="manager-identity"><b>'+esc(u.fullName)+'</b><span>'+esc(u.phone)+'</span><small>'+esc(u.status.toUpperCase())+' · '+(u.attemptCount||0)+' quiz attempts</small></div><div class="manager-buttons">'+(u.status!=='approved'?'<button type="button" data-act="approve" data-id="'+esc(u.id)+'">✓ Approve</button>':'')+'<button type="button" data-act="reset" data-id="'+esc(u.id)+'" class="manager-reset">🔑 Reset PIN</button><button type="button" data-act="status" data-id="'+esc(u.id)+'">Change status</button><button type="button" data-act="device" data-id="'+esc(u.id)+'">Reset device</button></div></div>').join(''):'<div class="manager-empty">No learners in this section. Try another section or search.</div>';
 }
