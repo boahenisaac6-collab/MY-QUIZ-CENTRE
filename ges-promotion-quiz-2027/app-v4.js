@@ -108,6 +108,28 @@ function answer(q,i){if(state.answers[q.id]!==undefined)return;state.answers[q.i
 async function finishQuiz(timedOut){clearInterval(state.timer);const score=state.quiz.reduce((n,q)=>n+(state.answers[q.id]===q.answer?1:0),0),answered=Object.keys(state.answers).length,duration=Math.round((Date.now()-state.startedAt)/1000);let r={score,total:state.quiz.length,answered,percentage:Math.round(score*100/state.quiz.length)};try{r=await api('submit_attempt',{attemptId:state.attempt?.attemptId,score,answered,durationSeconds:duration,timedOut})}catch(e){toast('Result saved on this device; server confirmation failed.',true)}addHistory({date:new Date().toISOString(),score:r.score??score,total:r.total??state.quiz.length,percentage:r.percentage??Math.round(score*100/state.quiz.length)});renderResult(r,state.user?.status!=='approved')}
 function renderResult(r,free=false){setView('resultScreen');const pct=r.percentage??0;$('resultScreen').innerHTML=`<section class="result-card"><div class="result-ring"><strong>${pct}%</strong><span>${r.score}/${r.total}</span></div><h2>${pct>=80?'Excellent work!':pct>=60?'Good progress!':'Keep practising!'}</h2><p>You answered ${r.answered??Object.keys(state.answers).length} questions. ${free?'You can repeat the free 30 questions or activate full access below.':''}</p><button id="againBtn" type="button" class="primary block">${free?'Practise Free 30 Again':'Start Another Practice'}</button><button id="perfBtn2" type="button" class="ghost block">View Performance</button><button id="dashBtn" type="button" class="ghost block">Back to Dashboard</button></section>${free?subTeaser(state.user?.status==='pending',true):''}`;$('againBtn').onclick=startPractice;$('perfBtn2').onclick=showPerformance;$('dashBtn').onclick=renderDashboard;$('subscribeBtn')?.addEventListener('click',requestSubscription);$('copyMomo')?.addEventListener('click',copyMomo)}
 async function showPerformance(){const local=readHistory();setView('performanceScreen');let rows=local,summary=null;if(state.user?.status==='approved'){try{const d=await api('performance');if(Array.isArray(d.attempts))rows=d.attempts.map(x=>({date:x.completed_at,score:x.score,total:x.question_count,percentage:x.percentage}));summary=d.summary}catch{}}if(!summary&&rows.length){const p=rows.map(x=>Number(x.percentage)||0),first=p[0],latest=p[p.length-1];summary={attempts:rows.length,average:Math.round(p.reduce((a,b)=>a+b,0)/p.length),best:Math.max(...p),improvement:latest-first}}$('performanceScreen').innerHTML=`<section class="panel"><div class="panel-head"><button id="perfBack" type="button" class="back">←</button><div><h3>My Performance</h3><small>Your practice progress</small></div></div>${summary?`<div class="stats"><div><strong>${summary.attempts}</strong><span>Attempts</span></div><div><strong>${summary.average}%</strong><span>Average</span></div><div><strong>${summary.best}%</strong><span>Best</span></div><div><strong>${summary.improvement>=0?'+':''}${summary.improvement}%</strong><span>Improvement</span></div></div>`:'<div class="hint">Complete a practice to start building your performance history.</div>'}<div class="history">${rows.slice().reverse().map((x,i)=>`<div class="history-row"><b>${x.percentage}%</b><span>${x.score}/${x.total}</span><small>${x.date?new Date(x.date).toLocaleString():`Attempt ${rows.length-i}`}</small></div>`).join('')}</div></section>`;$('perfBack').onclick=renderDashboard}
+let learnerSyncBusy=false,learnerSyncTick=0;
+async function liveLearnerSync(){
+ if(!state.token||!state.user||learnerSyncBusy||document.hidden)return;
+ if(document.getElementById('extraBankOverlay')||document.getElementById('studyBookSubscriberOverlay'))return;
+ learnerSyncBusy=true;
+ try{
+  const result=await api('me');
+  if(!state.user||!state.token)return;
+  const before=state.user.status,after=result.user?.status;
+  if(after&&after!==before){
+   state.user=result.user;state.settings=result.settings||state.settings;
+   if(after==='approved'){
+    toast('🎉 Your subscription is approved! Full access is now active.');
+    await prepareBank();
+   }else toast('Your subscription status has been updated.');
+   if($('dashboardScreen')&&!$('dashboardScreen').classList.contains('hidden'))renderDashboard();
+  }
+ }catch(e){if(e.status===401){console.warn('Learner session needs login');}}
+ finally{learnerSyncBusy=false;}
+}
+setInterval(liveLearnerSync,1500);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)liveLearnerSync()});
 function boot(){bindImmediate();showAuth('chooser');setupDeviceInBackground();restoreSession()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
